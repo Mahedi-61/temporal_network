@@ -47,14 +47,17 @@ def normalize_keypoints(body_kps):
 
     # for complete body pose
     elif(h != 0):
-        body_joint = [8, 9, 10, 11, 12, 13]  # selected body joints
+        body_joint = [2, 5, 9, 10,  12, 13]  # selected body joints
 
         for b_j in  body_joint:
             x_cor = b_j * 3
             y_cor = x_cor + 1
             
-            frame_kps.append((body_kps[x_cor] - x_cor_neck) / h)
-            frame_kps.append((body_kps[y_cor] - y_cor_neck) / h)
+            #frame_kps.append((body_kps[x_cor] - x_cor_neck) / h)
+            #frame_kps.append((body_kps[y_cor] - y_cor_neck) / h)
+
+            frame_kps.append(body_kps[x_cor])
+            frame_kps.append(body_kps[y_cor])
        
     return frame_kps, partial_body
 

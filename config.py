@@ -25,7 +25,7 @@ actual_fps = 4  #frame per step
 
 # train and validation sequence for gallery set
 ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04"]
-ls_gallery_valid_seq =  ["cl01", "cl02"]
+ls_gallery_valid_seq =  ["bg01", "bg02"]
 
 
 # test sequence for probe set
@@ -47,7 +47,7 @@ nb_angles = 11
 nb_steps = 32
 
 nb_layers = 2
-nb_cells = 100
+nb_cells = 90
 
 
 
@@ -80,7 +80,7 @@ training_epochs = 250
 
 # model utilites
 lr_reduce_factor = 0.5
-lr_reduce_patience = 15
+lr_reduce_patience = 10
 
 
 

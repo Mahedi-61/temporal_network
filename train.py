@@ -17,7 +17,7 @@ from . import config
 
 
 def scheduler(epoch):
-    if (epoch == 60):
+    if (epoch == 80):
         K.set_value(model.optimizer.lr, config.lr_fc)
 
     elif (epoch == 120):
