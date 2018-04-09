@@ -8,7 +8,6 @@ import os
 # project files
 from . import config
 from . import make_dataset
-from . import make_dataset
 
 # path variables and constant
 actual_fps = config.actual_fps
@@ -16,7 +15,7 @@ actual_fps = config.actual_fps
 
 
 # making training and validation dataset
-def set_dataset(data_type):
+def set_dataset(data_type, angle):
 
     # calculating total number of person have gait videos
     num_subject = len(os.listdir(config.pose_data_dir))
@@ -39,7 +38,7 @@ def set_dataset(data_type):
                                         config.ls_gallery_train_seq,
                                         data_type,
                                         start_id,
-                                        config.angle_list)
+                                        [angle])
 
 
     # validation dataset
@@ -49,7 +48,7 @@ def set_dataset(data_type):
                                         config.ls_gallery_valid_seq,
                                         data_type,
                                         start_id,
-                                        config.angle_list)
+                                        [angle])
 
 
     # probe-normal test set
@@ -87,69 +86,145 @@ def set_dataset(data_type):
 
 
 # methods for returning unstateful training and validation data
-def load_data(data_type, load_previous):
-    print("\nstart preprocessing %s data" % data_type)
+def load_train_data_per_angle(angle):
+    print("\nstart preprocessing training data")
 
-    # laoding array
-    if(load_previous == True):
-        if(data_type == "train"):
-            X_data = np.load(os.path.join(config.pose_dataset_dir, "X_train.npy"))
-            y_label = np.load(os.path.join(config.pose_dataset_dir, "y_train.npy"))
+    data, label = set_dataset("train", angle)
 
-        if(data_type == "valid"):
-            X_data = np.load(os.path.join(config.pose_dataset_dir, "X_valid.npy"))
-            y_label = np.load(os.path.join(config.pose_dataset_dir, "y_valid.npy"))
+    # finding angle which contains maximum timesteps
+    l = []
+    for k in range(config.nb_classes):
+        l.append(data[k][0].shape[0]) 
+
+    #print(l)
+    max_ts = max(l)
+    print("\nmaximum timesteps is:", max_ts)
+
+    X_train = np.ndarray(((max_ts * config.nb_classes),
+                          config.nb_steps,
+                          config.nb_features), dtype = np.float32)
+
+    y_train = np.ndarray(((max_ts * config.nb_classes),
+                          config.nb_steps,
+                          config.nb_classes), dtype = np.float32)
 
 
-    if(load_previous == False):
-        data, label = set_dataset(data_type)
-
-        # logic for converting list to numpy array
-        X_data = data[0][0]
-        y_label = label[0][0]
-
-        for s in range(config.nb_classes):
-            # trick for this faulty dataset sub: 109 has miss some angle
-            for a in range(len(data[s])):
+    
+    for i in range(config.nb_classes):
+        for ts in range(max_ts):
             
-                if(not (s == 0 and a == 0)):
-                    X_data = np.append(X_data, data[s][a], axis = 0)
-                    y_label = np.append(y_label, label[s][a], axis = 0)
+            index = (i * max_ts) +  ts
+            sub_angle_data =  data[i][0]
 
-        del data, label
+            # prepare label
+            y_train[index] = label[i][0][0]
+        
+            # prepare data
+            if(ts < sub_angle_data.shape[0]):
+                X_train[index] = sub_angle_data[ts]
 
-        # saving array
-        if(data_type == "train"):
-            np.save(os.path.join(config.pose_dataset_dir, "X_train.npy"), X_data)
-            np.save(os.path.join(config.pose_dataset_dir, "y_train.npy") ,y_label)
+            # repeat to to make stateful for angle which got ts lower than max_ts
+            # % for multiple repeat
+            elif(ts >= sub_angle_data.shape[0]):
+                j = ts % sub_angle_data.shape[0]
+                
+                #print(s, "not ok, j:", j)
+                X_train[index] = sub_angle_data[j]
 
-        if(data_type == "valid"):
-            np.save(os.path.join(config.pose_dataset_dir, "X_valid.npy"), X_data)
-            np.save(os.path.join(config.pose_dataset_dir, "y_valid.npy"), y_label)
+    return X_train, y_train
+
+
+
+
+def load_valid_data_per_angle(angle):
+    
+    print("\nstart preprocessing validation data")
+    data, label = set_dataset("valid", angle)
+
+    # logic for converting list to numpy array
+    X_data = data[0][0]
+    y_label = label[0][0]
+
+    for s in range(config.nb_classes):
+        
+        if(not (s == 0)):
+            X_data = np.append(X_data, data[s][0], axis = 0)
+            y_label = np.append(y_label, label[s][0], axis = 0)
 
     return X_data, y_label
+    
+
 
 
 
 
 # methods for returning unstateful training and validation data
-def load_probe_data(probe_type):
-    print("\nstart preprocessing probe data")
+def load_probe_data(data_type):
+    print("\nstart preprocessing %s data" % data_type)
 
-    probe_is = set_probe_set(probe_type)
-    probe_data = load_X(config.X_probe_file)
-    probe_label = load_y(config.y_probe_file)
+    # calculating total number of person have gait videos
+    num_subject = len(os.listdir(config.pose_data_dir))
+    print("\ntotal number subjects: ", num_subject)
 
-    return probe_data, probe_label, probe_is
+    total_id_list = sorted(os.listdir(config.pose_data_dir), key = lambda x: int(x[1:]))
+
+
+    print("subject id list: 63 to 124")
+    subject_id_list = total_id_list[:62]
+    print(subject_id_list)
+
+    # for label synchronization
+    start_id = 63
+
+    if(data_type == "nm"):
+        seq = config.ls_probe_nm_seq
+        
+    elif (data_type == "bg"):
+        seq = config.ls_probe_bg_seq
+        
+    elif(data_type == "cl"):
+        seq = config.ls_probe_cl_seq
+
+
+    # storing all probeset angle numpy array into a list
+    X_probe = []
+    y_probe = []
+
+    data, label = make_dataset.get_keypoints_for_all_subject(
+                                    subject_id_list,
+                                    seq,
+                                    data_type,
+                                    start_id,
+                                    config.angle_list)
+            
+
+    # logic for converting list to numpy array
+    for i in range(len(config.angle_list)):
+        for s in range(config.nb_classes):
+
+            if(s == 0):
+                X_data = data[0][i]
+                y_label = label[0][i]
+        
+            elif(not (s == 0)):
+                X_data  = np.append(X_data, data[s][0], axis = 0)
+                y_label = np.append(y_label, label[s][0], axis = 0)
+        
+ 
+        X_probe.append(X_data)
+        y_probe.append(y_label)
+
+        del X_data, y_label
+        
+    return X_probe, y_probe
 
 
 
 
 
 if __name__ == "__main__":
-    d, l = load_data("valid", False)
+    d, l = load_valid_data_per_angle()
 
-    print(l.shape)
 
 
 

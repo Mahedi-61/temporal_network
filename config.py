@@ -16,7 +16,6 @@ model_dir = os.path.join(root_dir.tn_path(), "model")
 checkpoint_dir = os.path.join(root_dir.tn_path(), "checkpoint")
 
 pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "pose_data")
-pose_dataset_dir = os.path.join(root_dir.tn_path(), "cache", "pose_dataset")
 
 
 # sequence parameter
@@ -24,7 +23,7 @@ actual_fps = 4  #frame per step
 
 
 # train and validation sequence for gallery set
-ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04"]
+ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04", "aug_nm04"]
 ls_gallery_valid_seq =  ["bg01", "bg02"]
 
 
@@ -34,10 +33,13 @@ ls_probe_bg_seq = ["bg01", "bg02"]
 ls_probe_cl_seq = ["cl01", "cl02"]
 
 
+# angle
 angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
-              "angle_072", "angle_108", "angle_090",
-              "angle_126", "angle_144", "angle_162", "angle_180"]
+              "angle_072", "angle_090", "angle_108", "angle_126",
+              "angle_144", "angle_162", "angle_180"]
 
+
+train_angle_nb = 0
 
 
 # model testing configuration
@@ -53,16 +55,16 @@ nb_cells = 90
 
 # model and their weights name
 rnn_model = "rnn_model.json"
-rnn_model_stateful = "rnn_model_stateful.json"
-
 rnn_model_path = os.path.join(model_dir, rnn_model)
+
+
+rnn_model_stateful = "rnn_model_stateful.json"
 rnn_model_stateful_path = os.path.join(model_dir, rnn_model_stateful)
 
-rnn_model_weight = "rnn_model_weight.h5"
-rnn_model_stateful_weight = "rnn_model_stateful_weight.h5"
 
-rnn_model_weight_path = os.path.join(model_dir, rnn_model_weight)
+rnn_model_stateful_weight = "rnn_model_stateful_weight.h5"
 rnn_model_stateful_weight_path = os.path.join(model_dir, rnn_model_stateful_weight)
+
 
 
 # network training parameter

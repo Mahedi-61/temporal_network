@@ -4,7 +4,6 @@
 import numpy as np
 from collections import Counter
 from sklearn.metrics import accuracy_score
-from keras.utils import to_categorical
 from prettytable import PrettyTable
 
 

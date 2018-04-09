@@ -19,7 +19,7 @@ nb_features = config.nb_features
 
 
 # normalize body keypoints according to PTSN paper         
-def normalize_keypoints(body_kps):
+def normalize_keypoints(body_kps, is_aug = False):
     
     """pose keypoints got 18 points (total = 54 elements, 18x3 (x, y and accuracy))
     body join point = {Nose(0), Neck(1), RShoulder(2), RElbow(3), RWrist(4),
@@ -58,7 +58,19 @@ def normalize_keypoints(body_kps):
 
             frame_kps.append(body_kps[x_cor])
             frame_kps.append(body_kps[y_cor])
-       
+
+
+        # aumentation
+        if(is_aug == True):
+            
+            # right
+            frame_kps[0] = frame_kps[0] - 1
+            frame_kps[1] = frame_kps[1] - 1
+
+            # left
+            frame_kps[2] = frame_kps[2] + 1
+            frame_kps[3] = frame_kps[3] - 1
+        
     return frame_kps, partial_body
 
 
@@ -66,7 +78,7 @@ def normalize_keypoints(body_kps):
 
 
 # formating json file
-def handling_json_data_file(data):
+def handling_json_data_file(data, is_aug):
     
     frame_kps = []
     is_multiple_people = False
@@ -87,7 +99,7 @@ def handling_json_data_file(data):
     # one people detected 
     else:
         pose_keypoints = data["people"][0]["pose_keypoints_2d"]
-        frame_kps, is_partial_body = normalize_keypoints(pose_keypoints)
+        frame_kps, is_partial_body = normalize_keypoints(pose_keypoints, is_aug)
         
     return frame_kps, is_no_people, is_multiple_people, is_partial_body
 
@@ -108,8 +120,19 @@ def get_format_data(subject_id,
     # check how many image frame of length 32 we can get
     nb_images = len(seq_kps)
 
-    if(nb_images < nb_steps): nb_image_set = 0
-    else: nb_image_set = int((nb_images - nb_steps) / actual_fps) + 1
+    # trick for this faulty dataset sub: 109 has miss some angle
+    # for larger than 15 image sequene creating one timestep
+    if(nb_images < nb_steps):
+        if ((nb_steps - nb_images) > 16):
+            nb_image_set = 0
+
+        else:
+            nb_image_set = 1
+            seq_kps = seq_kps * 2
+        
+    else:
+        nb_image_set = int((nb_images - nb_steps) / actual_fps) + 1
+
 
     # finding lable of from subject data file
     sub_label = int(subject_id[1:]) - start_id
@@ -181,8 +204,15 @@ def get_keypoints_for_all_subject(subject_id_list,
             print("\n********** angle:", angle, "********** ")
             
             # considering each gait sequence
-            for seq in walking_seq:
-                seq_dir = os.path.join(subject_angle_dir, seq)
+            for seq in walking_seq:                      
+                if(seq == "aug_nm04"):
+                    is_aug = True
+                    seq_dir = os.path.join(subject_angle_dir, "nm04")
+                    
+                else:
+                    seq_dir = os.path.join(subject_angle_dir, seq)
+                    is_aug = False
+                    
                 seq_kps = []
 
                 # setting directory
@@ -196,7 +226,7 @@ def get_keypoints_for_all_subject(subject_id_list,
                     with open(file) as data_file:
                         data = json.load(data_file)
                         
-                        frame_kps, no_people, multiple_people, partial_body = handling_json_data_file(data)
+                        frame_kps, no_people, multiple_people, partial_body = handling_json_data_file(data, is_aug)
 
                         # counting no, multiple people and partial body detected
                         if (no_people == True):
@@ -211,7 +241,7 @@ def get_keypoints_for_all_subject(subject_id_list,
                         # for single people save the frame key points
                         else:
                              # add all frame kps of all seq in an angle_kps
-                            seq_kps.append(frame_kps)
+                            seq_kps.append(frame_kps)                            
 
                 # saving each seq walking data
                 seq_data, seq_label = get_format_data(subject_id,

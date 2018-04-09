@@ -22,15 +22,20 @@ from keras.callbacks import (EarlyStopping,
 from ... import root_dir
 from . import config
 
+rnn_model_weight = "rnn_model_weight.h5"
+
 
 # reading model
-def read_rnn_model():
+def read_rnn_model(angle):
     print("\nreading stored rnn model architecture and weight ...")
     
     json_string = open(config.rnn_model_path).read()
-
     model = model_from_json(json_string)
-    model.load_weights(config.rnn_model_weight_path)
+
+    rnn_model_weight_path = os.path.join(config.model_dir,
+                            angle + "_" + rnn_model_weight)
+    
+    model.load_weights(rnn_model_weight_path)
 
     return model
 
@@ -42,8 +47,8 @@ def read_rnn_model_stateful():
     print("\nreading stored rnn stateful model architecture and weight ...")
     
     json_string = open(config.rnn_model_stateful_path).read()
-
     model = model_from_json(json_string)
+    
     model.load_weights(config.rnn_model_stateful_weight_path)
 
     return model
@@ -51,10 +56,10 @@ def read_rnn_model_stateful():
 
 
 # saving checkpoint
-def save_rnn_model_checkpoint():
+def save_rnn_model_checkpoint(angle):
 
     rnn_model_weight_path = os.path.join(config.checkpoint_dir,
-                            config.rnn_model_weight)
+                                angle + "_" + rnn_model_weight)
     
     return ModelCheckpoint(rnn_model_weight_path,
                 monitor = 'val_loss',
@@ -63,6 +68,7 @@ def save_rnn_model_checkpoint():
                 save_weights_only = True,
                 mode = 'auto',
                 period = 1)
+
 
 
 

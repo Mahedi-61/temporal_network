@@ -8,6 +8,9 @@ from keras.layers import (Input, Dense, Dropout,
                           LSTM, BatchNormalization, Bidirectional,
                           Activation)
 
+from keras import regularizers
+
+
 # project modules
 from . import config
 
@@ -38,10 +41,9 @@ def model_rnn(stateful = False):
                 merge_mode = "concat"))
 
 
-        model.add(Dropout(rate = 0.4))
-
         # output softmax layer
-        model.add(Dense(config.nb_classes))
+        model.add(TimeDistributed(Dense(config.nb_classes,
+                                        kernel_initializer = "uniform")))
         
         model.add(BatchNormalization(momentum = 0.99,
                                      epsilon = 1e-5))
@@ -74,7 +76,7 @@ def model_rnn(stateful = False):
                     stateful = True),
                 merge_mode = "concat"))
 
-        model.add(Dropout(rate = 0.4))
+        model.add(Dropout(rate = 0.3))
         
         # output softmax layer
         model.add(TimeDistributed(Dense(config.nb_classes,
