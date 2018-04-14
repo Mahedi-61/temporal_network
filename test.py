@@ -2,6 +2,7 @@
 
 # python packages
 import numpy as np
+import sys
 from collections import Counter
 from sklearn.metrics import accuracy_score
 from prettytable import PrettyTable
@@ -15,7 +16,7 @@ from . import config
 
 # path variables and constant
 batch_size = config.testing_batch_size
-probe_type = "bg"
+probe_type = str(sys.argv[1]) 
 
 # display options
 table = PrettyTable(["data_angle", "probe_000", "probe_018", "probe_036",
@@ -36,7 +37,6 @@ def get_prediction_all_ts(predictions):
         pred_angle.append(Counter(pred_ts).most_common()[0][0])
 
     #print(pred_angle)
-    
     return pred_angle
 
 
@@ -50,6 +50,28 @@ def get_reduce_dimension(y_true):
     return y
     
     
+
+def get_predicted_each_subject(y_true, y_pred):
+    sub_prediction = []
+    present_pointer = 0
+
+    c = Counter(y_true)
+    sub_ts_length = [c.get(i) for i in range(62)]
+    
+    for ts_len in sub_ts_length:
+        
+        next_pointer = present_pointer + ts_len
+        #print(y_pred[present_pointer : next_pointer])
+
+        each_sub_predicted_ts = y_pred[present_pointer : next_pointer]
+        sub_prediction.append(Counter(each_sub_predicted_ts).most_common()[0][0])
+
+        present_pointer += ts_len
+  
+    return sub_prediction
+        
+        
+    
     
 
 def get_total_prediction(X_probe, y_probe, model):
@@ -60,7 +82,7 @@ def get_total_prediction(X_probe, y_probe, model):
     # calculation for each angle
     for p_angle in range(config.nb_angles):
 
-        print("\n\n************** angle:", config.angle_list[p_angle], "**************")
+        print("\n\n**************", config.angle_list[p_angle], "**************")
 
         print("\n" + config.angle_list[p_angle], "probe data shape: ",
                                                   X_probe[p_angle].shape)
@@ -70,9 +92,9 @@ def get_total_prediction(X_probe, y_probe, model):
 
         # true label
         y_true = get_reduce_dimension(y_probe[p_angle])
-        print("true label length: ", len(y_true))
+        #print("true label length: ", len(y_true))
 
-     
+        
         # predicting at an angle each...
         print("\npredicting ...")
         predictions = model.predict(X_probe[p_angle],
@@ -83,10 +105,15 @@ def get_total_prediction(X_probe, y_probe, model):
         print("predictions shape: ", predictions.shape)
         y_pred = get_prediction_all_ts(predictions)
 
-        print("all timesteps prediction length: ", len(y_pred))
+        # get subject wise actual label and prediction
+        sub_wise_pred = get_predicted_each_subject(y_true, y_pred)
+        acutal_label = [i for i in range(62)]
 
-        acc_score = accuracy_score(y_true, y_pred)
-        print(config.angle_list[p_angle], "accuracy: ", acc_score * 100)
+        print("actual label:\n", acutal_label)
+        print("\npredicted label\n", sub_wise_pred)
+        
+        acc_score = accuracy_score(acutal_label, sub_wise_pred)
+        print("\n", config.angle_list[p_angle], "accuracy: ", acc_score * 100)
 
         row.append("{0:.4f}".format(acc_score * 100))
         
@@ -103,7 +130,7 @@ probe_data, probe_label = data_preparation.load_probe_data(probe_type)
 
 print("\n### test result of my rnn algorithm on CASIA Dataset-B ###")
 
-for data_angle in range(1):
+for data_angle in range(config.nb_angles):
 
     # loading trained model
     angle = config.angle_list[data_angle]

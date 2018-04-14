@@ -39,7 +39,7 @@ angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
               "angle_144", "angle_162", "angle_180"]
 
 
-train_angle_nb = 0
+train_angle_nb = 1
 
 
 # model testing configuration
@@ -71,10 +71,11 @@ rnn_model_stateful_weight_path = os.path.join(model_dir, rnn_model_stateful_weig
 learning_rate = 1e-3
 lr_fc = 5e-4
 lr_sc = 2.5e-4
-lr_tc = 1e-4
+lr_tc = 1.25e-4
+
 
 training_batch_size = 128
-testing_batch_size = 1
+testing_batch_size = 256
 stateful_batch_size = nb_classes
 
 training_epochs = 250

@@ -36,7 +36,8 @@ def read_rnn_model(angle):
                             angle + "_" + rnn_model_weight)
     
     model.load_weights(rnn_model_weight_path)
-
+    
+    print("loaded model directory: ", angle + "_" + rnn_model_weight)
     return model
 
 

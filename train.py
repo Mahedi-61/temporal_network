@@ -20,10 +20,10 @@ def scheduler(epoch):
     if (epoch == 10):
         K.set_value(model.optimizer.lr, config.lr_fc)
 
-    elif (epoch == 80):
+    elif (epoch == 50):
         K.set_value(model.optimizer.lr, config.lr_sc)
 
-    elif (epoch == 200):
+    elif (epoch == 100):
         K.set_value(model.optimizer.lr, config.lr_tc)
         
     print("learning rate: ", K.get_value(model.optimizer.lr))
@@ -54,10 +54,10 @@ print("valid label shape: ", y_valid.shape)
 
 
 # constructing model
-model = my_models.model_rnn(stateful = False)
+#model = my_models.model_rnn(stateful = False)
 
 # train model once again
-#model = model_utils.read_rnn_model(angle)
+model = model_utils.read_rnn_model(angle)
 
 
 
