@@ -24,7 +24,7 @@ actual_fps = 4  #frame per step
 
 # train and validation sequence for gallery set
 ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04", "aug_nm04"]
-ls_gallery_valid_seq =  ["bg01", "bg02"]
+ls_gallery_valid_seq =  ["cl01", "bg02"]
 
 
 # test sequence for probe set
@@ -75,7 +75,7 @@ lr_tc = 1.25e-4
 
 
 training_batch_size = 128
-testing_batch_size = 256
+testing_batch_size = 1024
 stateful_batch_size = nb_classes
 
 training_epochs = 250

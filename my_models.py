@@ -24,7 +24,7 @@ def model_rnn(stateful = False):
     if (stateful == False):
         
         # input layer
-        model.add(BatchNormalization(momentum = 0.99,
+        model.add(BatchNormalization(momentum = 0.92,
                         epsilon = 1e-5,
                         input_shape =(config.nb_steps,
                                       config.nb_features)))
@@ -45,7 +45,7 @@ def model_rnn(stateful = False):
         model.add(TimeDistributed(Dense(config.nb_classes,
                                         kernel_initializer = "uniform")))
         
-        model.add(BatchNormalization(momentum = 0.99,
+        model.add(BatchNormalization(momentum = 0.29,
                                      epsilon = 1e-5))
         
         model.add(Activation('softmax'))
