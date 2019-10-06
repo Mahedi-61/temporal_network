@@ -20,21 +20,21 @@ def run_openpose(subject_id_list):
 
     # considering each subject
     for subject_id in subject_id_list:
-        
+
         subject_dir = os.path.join(input_dir, subject_id)
         angle_list = sorted(os.listdir(subject_dir), key = lambda x: int(x[-3:]))
 
         num_angle =  len(angle_list)
         print("\n\n%s subject have: %d angle gait vidoes" % (subject_id, num_angle))
-        
+
         # considering each angle
         for angle in angle_list:
             subject_angle_dir = os.path.join(subject_dir, angle)
-
             seq_list = sorted(os.listdir(subject_angle_dir))
 
             num_seq = len(seq_list)
             print("%s angle have %d gait sequence" % (angle, num_seq))
+
 
             # considering each gait sequence
             for seq in seq_list:
@@ -46,13 +46,12 @@ def run_openpose(subject_id_list):
 
                 # setting openpose directory
                 os.chdir(config.openpose_dir)
-                
+
                 print("\ncalculationg pose...")
-                os.system("./build/examples/openpose/openpose.bin --image_dir " +  seq_dir +
-                     " --write_json " +  save_dir + " --display 0 --render_pose 0")
+                #os.system("./build/examples/openpose/openpose.bin --image_dir " +  seq_dir + " --write_json " +  save_dir + " --display 0 --render_pose 0")
 
-
-
+                os.system("./build/examples/openpose/openpose.bin --image_dir " +  seq_dir + " --flir_camera --3d --number_people_max 1 " +
+                " --write_json " +  save_dir + " --display 0 --render_pose 0")
 
 
 
@@ -68,7 +67,7 @@ def get_pose_data():
 
 
     print("\ngallery subject id list: 63 to 124")
-    gallery_subject_id_list = total_id_list[50:60]
+    gallery_subject_id_list = total_id_list[0:1]
     print(gallery_subject_id_list)
 
     run_openpose(gallery_subject_id_list)
@@ -81,11 +80,3 @@ def get_pose_data():
 # run here
 if __name__ == "__main__":
     get_pose_data()
-
-
-
-
-
-
-
-
