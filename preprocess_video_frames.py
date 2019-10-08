@@ -1,7 +1,7 @@
 """
 # Project: gait_recognition
 # Author : Md. Mahedi Hasan
-# File : process_video_frames_for_train.py
+# File : process_video_frames.py
 # Description : detecting and cropping bounding boxes on the input training images using darknet
 """
 
@@ -155,19 +155,5 @@ remove_previous_cache_files()
 get_list_input_img_for_all_subjejects(subject_id_list)
 detect_people_using_darknet()
 crop_detected_images()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

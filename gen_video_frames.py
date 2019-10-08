@@ -1,13 +1,15 @@
-"""making image (video frame) sequence from given video files for training"""
+"""
+Author: Md Mahedi Hasan
+Description: generating frames from given video files
+"""
 
 # python packages
 import cv2
 import os
 
 
-
 # project modules
-from .. import root_dir
+from ... import root_dir
 
 
 
@@ -103,18 +105,11 @@ def gen_video_frames(ls_video_files):
 
 
 # set training subject id (including end id)
-start_id = 67
-end_id = 67
+start_id = 94
+end_id = 124
 
 # getting associated video files
 ls_video_files = get_all_video_files_for_train (start_id, end_id)
 
-
 # making video frames for given videos
 gen_video_frames(ls_video_files)
-
-
-
-
-
-

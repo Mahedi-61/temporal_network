@@ -1,4 +1,7 @@
-"""this file contains temporal network configuration info"""
+"""
+Author: Md Mahedi Hasan
+Description: this file contains configuration info for temporal network
+"""
 
 # python packages
 import os
@@ -11,7 +14,9 @@ from ... import root_dir
 openpose_dir = os.path.join(root_dir.libs_path(), "openpose")
 model_dir = os.path.join(root_dir.tn_path(), "model")
 checkpoint_dir = os.path.join(root_dir.tn_path(), "checkpoint")
-pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "pose_data")
+
+casiaA_pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "casiaA_pose_data")
+casiaB_pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "casiaB_pose_data")
 
 
 # sequence parameter
@@ -39,7 +44,7 @@ train_angle_nb = 9
 
 # model testing configuration
 nb_features = 20
-nb_classes = 62
+nb_classes = 100
 nb_angles = 11
 nb_steps = 28
 
@@ -51,12 +56,6 @@ nb_cells = 80
 rnn_model = "rnn_model.json"
 rnn_model_path = os.path.join(model_dir, rnn_model)
 
-"""
-rnn_model_stateful = "rnn_model_stateful.json"
-rnn_model_stateful_path = os.path.join(model_dir, rnn_model_stateful)
-rnn_model_stateful_weight = "rnn_model_stateful_weight.h5"
-rnn_model_stateful_weight_path = os.path.join(model_dir, rnn_model_stateful_weight)
-"""
 
 # network training parameter
 learning_rate = 5e-4
