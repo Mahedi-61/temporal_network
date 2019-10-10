@@ -19,19 +19,33 @@ casiaA_pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "casiaA_pose_da
 casiaB_pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "casiaB_pose_data")
 
 
-# sequence parameter
-actual_fps = 4  #frame per step
-
 
 # train and validation sequence for gallery set
-ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04"]
-ls_gallery_valid_seq =  ["cl01", "bg02"]
+# CASIA A
+def get_casiaA_train_valid_seq(angle):
+    if angle == "0":
+        casiaA_gallery_train_seq =  ["00_1", "00_2", "00_3"]
+        casiaA_gallery_valid_seq =  ["00_4"]
+
+    elif angle == "45":
+        casiaA_gallery_train_seq =  ["45_1", "45_2", "45_3"]
+        casiaA_gallery_valid_seq =  ["45_4"]
+
+    else:
+        casiaA_gallery_train_seq =  ["90_1", "90_2", "90_3"]
+        casiaA_gallery_valid_seq =  ["90_4"]
+
+    return casiaA_gallery_train_seq, casiaA_gallery_valid_seq
+
+# CASIA B
+casiaB_ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04"]
+casiaB_ls_gallery_valid_seq =  ["cl01", "bg02"]
 
 
 # test sequence for probe set
-ls_probe_nm_seq = ["nm05", "nm06"]
-ls_probe_bg_seq = ["bg01", "bg02"]
-ls_probe_cl_seq = ["cl01", "cl02"]
+casiaB_ls_probe_nm_seq = ["nm05", "nm06"]
+casiaB_ls_probe_bg_seq = ["bg01", "bg02"]
+casiaB_ls_probe_cl_seq = ["cl01", "cl02"]
 
 
 # angle
@@ -43,11 +57,21 @@ angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
 train_angle_nb = 9
 
 # model testing configuration
-nb_features = 20
-nb_classes = 100
-nb_angles = 11
-nb_steps = 28
+# for CASIA A dataset
+casiaA_nb_features = 20
+casiaA_nb_classes = 20
+casiaA_nb_angles = 3
+casiaA_nb_steps = 28
 
+# for CASIA B dataset
+casiaB_nb_features = 20
+casiaB_nb_classes = 100
+casiaB_nb_angles = 11
+casiaB_nb_steps = 28
+
+
+# network architecture
+actual_fps = 4  #frame per step
 nb_layers = 2
 nb_cells = 80
 
@@ -62,12 +86,6 @@ learning_rate = 5e-4
 lr_1 = 1e-4
 lr_2 = 5e-5
 lr_3 = 2.5e-5
-
-
-training_batch_size = 256
-testing_batch_size = 1024
-stateful_batch_size = nb_classes
-training_epochs = 450
 
 
 # model utilites
