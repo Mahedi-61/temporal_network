@@ -1,9 +1,10 @@
-"""this file contains code for handling rnn model utilities"""
 """
+Author: Md Mahedi Hasan
+Description: this file contains code for handling rnn model utilities
 Notes:
 # all models are palced and stored in model directory
 # model checkpoint are saved in checkpoint directory with epoch number
-# so final model should be replaced from checkpoint to model dir without epoch number.
+# so final model should be replaced from checkpoint to model dir
 """
 
 # python modules
@@ -19,25 +20,24 @@ from keras.callbacks import (EarlyStopping,
 # project modules
 from ... import root_dir
 from . import config
-from .my_models import CenterLossLayer
+from .my_models_casiaA import CenterLossLayer
  
-
-rnn_model_weight = "rnn_model_weight.h5"
 
 
 # reading model
 def read_rnn_model(angle):
     print("\nreading stored rnn model architecture and weight ...")
     
-    json_string = open(config.rnn_model_path).read()
-    model = model_from_json(json_string,  custom_objects={'CenterLossLayer': CenterLossLayer})
+    json_string = open(config.casiaA_rnn_model_path).read()
+    model = model_from_json(json_string, 
+                    custom_objects={'CenterLossLayer': CenterLossLayer})
 
     rnn_model_weight_path = os.path.join(config.model_dir,
-                            angle + "_" + rnn_model_weight)
+                            angle + "_" + config.casiaA_rnn_model_weight)
     
     model.load_weights(rnn_model_weight_path)
     
-    print("loaded model directory: ", angle + "_" + rnn_model_weight)
+    print("loaded model directory: ", angle + "_" + config.casiaA_rnn_model_weight)
     return model
 
 
@@ -46,7 +46,7 @@ def read_rnn_model(angle):
 def save_rnn_model_checkpoint(angle):
 
     rnn_model_weight_path = os.path.join(config.checkpoint_dir,
-                                angle + "_" + rnn_model_weight)
+                                angle + "_" + config.casiaA_rnn_model_weight)
     
     return ModelCheckpoint(rnn_model_weight_path,
                 monitor = 'val_activation_1_acc',
@@ -59,10 +59,10 @@ def save_rnn_model_checkpoint(angle):
 
 
 # saving model
-def save_rnn_model_stateful_weight(model, angle):
+def save_rnn_model_weight(model, angle):
 
     rnn_model_weight_path = os.path.join(config.checkpoint_dir, 
-                                        angle + "_" + rnn_model_weight)
+                                angle + "_" + config.casiaA_rnn_model_weight)
 
     return model.save_weights(rnn_model_weight_path)
 
@@ -87,15 +87,5 @@ def set_early_stopping():
                                mode = "auto",
                                verbose = 2)
 
-
-
-
-def show_loss_function(loss, val_loss, nb_epochs):
-    plt.xlabel("Epochs ------>")
-    plt.ylabel("Loss -------->")
-    plt.title("Loss function")
-    plt.plot(loss, "blue", label = "Training Loss")
-    plt.plot(val_loss, "green", label = "Validation Loss")
-    plt.xticks(range(0, nb_epochs)[0::2])
-    plt.legend()
-    plt.show()
+if __name__ == "__main__":
+    read_rnn_model("0")

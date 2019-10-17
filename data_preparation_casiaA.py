@@ -13,7 +13,7 @@ from . import make_dataset_casiaA
 
 # path variables and constant
 actual_fps = config.actual_fps
-
+probe_angle = ["0", "45", "90"]
 
 
 # making training and validation dataset
@@ -40,7 +40,7 @@ def set_dataset(data_type, angle):
                                         start_id)
 
     # validation & test dataset
-    elif (data_type == "valid"):
+    elif (data_type == "valid" or data_type == "test"):
         data, label =  make_dataset_casiaA.get_keypoints_for_all_subject(
                                         total_id_list,
                                         valid_seq,
@@ -117,6 +117,18 @@ def load_data(data_type, angle):
     return X_data, y_label
 
 
+
+def load_probe_data():
+    X_test = []
+    y_test = []
+
+    for angle in probe_angle:
+        data, label = load_data("test", angle)
+        X_test.append(data)
+        y_test.append(label)
+
+    return X_test, y_test
+
+
 if __name__ == "__main__":
-    X_valid, y_valid = load_data("train", "90")
-    #print(X_valid[0][0])
+    X_valid, y_valid = load_probe_data()

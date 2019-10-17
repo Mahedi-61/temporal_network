@@ -64,8 +64,8 @@ casiaA_nb_angles = 3
 casiaA_nb_steps = 28
 
 # for CASIA B dataset
-casiaB_nb_features = 20
-casiaB_nb_classes = 100
+#casiaB_nb_features = 20
+#casiaB_nb_classes = 100
 casiaB_nb_angles = 11
 casiaB_nb_steps = 28
 
@@ -73,20 +73,19 @@ casiaB_nb_steps = 28
 # network architecture
 actual_fps = 4  #frame per step
 nb_layers = 2
-nb_cells = 80
+nb_cells = 100
 
 
 # model and their weights name
-rnn_model = "rnn_model.json"
-rnn_model_path = os.path.join(model_dir, rnn_model)
+casiaA_rnn_model = "casiaA_rnn_model.json"
+casiaA_rnn_model_path = os.path.join(model_dir, casiaA_rnn_model)
+casiaA_rnn_model_weight = "casiaA_rnn_model_weight.h5"
 
 
 # network training parameter
-learning_rate = 5e-4
-lr_1 = 1e-4
-lr_2 = 5e-5
-lr_3 = 2.5e-5
-
+learning_rate = 1e-3 
+lr_1 = 5e-4
+lr_2 = 1e-4
 
 # model utilites
-early_stopping = 50
+early_stopping = 200

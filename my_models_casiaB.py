@@ -91,7 +91,7 @@ def get_temporal_model():
     model = Model(inputs=[main_input, aux_input], outputs=[final_output, side_output])
 
     # saving as json file in model directory
-    open(config.rnn_model_path, 'w').write(model.to_json())
+    open(config.casiaA_rnn_model_path, 'w').write(model.to_json())
 
     print("model json saved !!")
     return model
