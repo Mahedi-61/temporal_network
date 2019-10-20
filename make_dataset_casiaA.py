@@ -41,7 +41,9 @@ def handling_json_data_file(data):
         if(not is_partial_body):
             #frame_kps = hf.normalize_keypoints(pose_keypoints)
             #frame_kps = hf.get_body_limb(pose_keypoints)
-            
+            frame_kps = hf.get_joint_angle(pose_keypoints)
+
+            """
             # for first frame, store the  bpks and skip the motion feat.
             if(len(first_frame_bkps) == 0):
                 first_frame_bkps = pose_keypoints
@@ -52,7 +54,7 @@ def handling_json_data_file(data):
                 frame_kps = hf.get_motion_featurs(second_frame_bpks, 
                                                   first_frame_bkps)
                 first_frame_bkps = second_frame_bpks
-            
+            """
     return frame_kps, is_no_people, is_partial_body
 
 
@@ -112,6 +114,7 @@ def get_keypoints_for_all_subject(subject_id_list,
                                   data_type,
                                   start_id):
 
+    global first_frame_bkps
     print("\n\n*********** Generating %s data ***********" % data_type)    
     total_dataset = []
     total_dataset_label = []
@@ -137,7 +140,8 @@ def get_keypoints_for_all_subject(subject_id_list,
         print("%s subject have: %d walking gait vidoes" % (subject_id, num_walking_seq))
             
         # considering each gait sequence
-        for seq in walking_seq:               
+        for seq in walking_seq:
+            first_frame_bkps = []
             seq_dir = os.path.join(subject_dir, seq)
 
             # setting directory
@@ -153,7 +157,7 @@ def get_keypoints_for_all_subject(subject_id_list,
                     data = json.load(data_file)         
                     frame_kps, no_people, partial_body = handling_json_data_file(data)
 
-                    print("frame no: ", f+1); print(frame_kps)
+                    #print("frame no: ", f+1); print(frame_kps)
                     # counting no, multiple people and partial body detected
                     if (no_people == True):  sub_total_no_people += 1
                     elif (partial_body == True): sub_total_partial_body += 1

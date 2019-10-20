@@ -58,7 +58,7 @@ train_angle_nb = 9
 
 # model testing configuration
 # for CASIA A dataset
-casiaA_nb_features = 20
+casiaA_nb_features = 13
 casiaA_nb_classes = 20
 casiaA_nb_angles = 3
 casiaA_nb_steps = 28

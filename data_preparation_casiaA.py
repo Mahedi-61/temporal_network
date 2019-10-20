@@ -131,4 +131,4 @@ def load_probe_data():
 
 
 if __name__ == "__main__":
-    X_valid, y_valid = load_probe_data()
+    X_valid, y_valid = load_data("train", "90")

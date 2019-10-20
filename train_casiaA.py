@@ -1,6 +1,6 @@
 """ 
 Author: Md Mahedi Hasan
-Description: train a rnn network using pose sequence of Casia-B dataset
+Description: train a rnn network using pose sequence of Casia-A dataset
 """
 
 # python packages
@@ -37,10 +37,10 @@ def zero_loss(y_true, y_pred):
 
 
 # path variables and constant
-batch_size = 256
+batch_size = 128
 nb_epochs = 400
 lr = config.learning_rate
-angle = "45"
+angle = "90"
 
 
 # loading traing and validation data
@@ -62,7 +62,7 @@ model = my_models_casiaA.get_temporal_model()
 
 
 ### run model
-lambda_centerloss = 0.01
+lambda_centerloss = 0.008
 
 optimizer = Adam(lr = lr)
 model.compile(optimizer = optimizer,
