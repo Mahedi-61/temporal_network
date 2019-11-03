@@ -77,7 +77,7 @@ def is_partial_body(body_kps):
 # normalize body keypoints according to PTSN paper         
 def normalize_keypoints(body_kps):
 
-    body_joint = [9, 10, 11, 12, 13, 14, 21, 24, 2, 5] 
+    body_joint = [9, 10, 11, 12, 13, 14] 
     frame_kps = []
     
     # calculating distance between right_ankle and center of the hip
@@ -93,12 +93,12 @@ def normalize_keypoints(body_kps):
         norm_y =   (body_kps[y_cor] - body_kps[y_cor_neck]) 
 
         # without normalize
-        #frame_kps.append(norm_x)
-        #frame_kps.append(norm_y)
+        frame_kps.append(norm_x)
+        frame_kps.append(norm_y)
 
         # normalize
-        frame_kps.append(norm_x / unit_length)
-        frame_kps.append(norm_y / unit_length)
+        #frame_kps.append(norm_x / unit_length)
+        #frame_kps.append(norm_y / unit_length)
 
     return frame_kps
 

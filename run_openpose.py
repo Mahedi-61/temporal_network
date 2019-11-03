@@ -18,7 +18,7 @@ from . import config
 input_dir = os.path.join(root_dir.data_path(), "CasiaB_frames")
 
 
-# running openpose
+# running openpose for casiaA dataset
 def run_openpose_casiaA(subject_id_list):
 
     # considering each subject
@@ -48,6 +48,7 @@ def run_openpose_casiaA(subject_id_list):
 
 
 
+# running openpose for casiaB dataset
 def run_openpose_casiaB(subject_id_list):
 
     # considering each subject
@@ -79,7 +80,7 @@ def run_openpose_casiaB(subject_id_list):
                 os.chdir(config.openpose_dir)
 
                 print("\ncalculationg pose...")
-                
+
                 os.system("./build/examples/openpose/openpose.bin --image_dir " +  
                         seq_dir + " --number_people_max 1 " + " --write_json " +  
                         save_dir + " --display 0 --render_pose 0")
@@ -96,7 +97,7 @@ def get_pose_data():
     print(total_id_list)
 
     print("\ngallery subject id list: 25 to 124")
-    gallery_subject_id_list = total_id_list[0:10]
+    gallery_subject_id_list = total_id_list[1:4]
     print(gallery_subject_id_list)
 
     run_openpose_casiaB(gallery_subject_id_list)

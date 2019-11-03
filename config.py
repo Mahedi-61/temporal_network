@@ -39,7 +39,7 @@ def get_casiaA_train_valid_seq(angle):
 
 # CASIA B
 casiaB_ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04"]
-casiaB_ls_gallery_valid_seq =  ["cl01", "bg02"]
+casiaB_ls_gallery_valid_seq =  ["cl01", "cl02"]
 
 
 # test sequence for probe set
@@ -54,7 +54,7 @@ angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
               "angle_144", "angle_162", "angle_180"]
 
 
-train_angle_nb = 9
+train_angle_nb = 0
 
 # model testing configuration
 # for CASIA A dataset
@@ -64,8 +64,8 @@ casiaA_nb_angles = 3
 casiaA_nb_steps = 28
 
 # for CASIA B dataset
-#casiaB_nb_features = 20
-#casiaB_nb_classes = 100
+casiaB_nb_features = 12
+casiaB_nb_classes = 100
 casiaB_nb_angles = 11
 casiaB_nb_steps = 28
 
@@ -81,11 +81,17 @@ casiaA_rnn_model = "casiaA_rnn_model.json"
 casiaA_rnn_model_path = os.path.join(model_dir, casiaA_rnn_model)
 casiaA_rnn_model_weight = "casiaA_rnn_model_weight.h5"
 
+casiaB_rnn_model = "casiaB_rnn_model.json"
+casiaB_rnn_model_path = os.path.join(model_dir, casiaB_rnn_model)
+casiaB_rnn_model_weight = "casiaB_rnn_model_weight.h5"
+
 
 # network training parameter
 learning_rate = 1e-3 
 lr_1 = 5e-4
 lr_2 = 1e-4
+lr_3 = 5e-5
+
 
 # model utilites
 early_stopping = 200

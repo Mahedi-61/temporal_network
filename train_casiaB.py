@@ -10,20 +10,20 @@ from keras.callbacks import LearningRateScheduler
 
 
 # project modules
-from . import my_models
-from . import model_utils
-from . import data_preparation
+from . import my_models_casiaB
+from . import model_utils_casiaB
+from . import data_preparation_casiaB
 from . import config
 
 
 def scheduler(epoch):
-    if (epoch == 60):
+    if (epoch == 30):
         K.set_value(model.optimizer.lr, config.lr_1)
 
-    elif (epoch == 150):
+    elif (epoch == 50):
         K.set_value(model.optimizer.lr, config.lr_2)
 
-    elif (epoch == 300):
+    elif (epoch == 150):
         K.set_value(model.optimizer.lr, config.lr_3)
         
     print("learning rate: ", K.get_value(model.optimizer.lr))
@@ -36,32 +36,32 @@ def zero_loss(y_true, y_pred):
 
 
 # path variables and constant
-batch_size = config.training_batch_size
-nb_epochs = config.training_epochs
+batch_size = 128
+nb_epochs = 200
 lr = config.learning_rate
 angle = config.angle_list[config.train_angle_nb]
 
 
 # loading traing and validation data
-X_train, y_train = data_preparation.load_train_data_per_angle(angle)
+X_train, y_train = data_preparation_casiaB.load_train_data_per_angle(angle)
 print("\ntrian data shape: ", X_train.shape)
 print("train label shape: ", y_train.shape)
 
 
-X_valid, y_valid = data_preparation.load_valid_data_per_angle(angle)
+X_valid, y_valid = data_preparation_casiaB.load_valid_data_per_angle(angle)
 print("\nvalid data shape: ", X_valid.shape)
 print("valid label shape: ", y_valid.shape)
 
 
 # constructing model
-model = my_models.get_temporal_model()
+model = my_models_casiaB.get_temporal_model()
 
 # train model once again
 #model = model_utils.read_rnn_model(angle)
 
 
 ### run model
-lambda_centerloss = 0.01
+lambda_centerloss = 0.008
 
 optimizer = Adam(lr = lr)
 model.compile(optimizer = optimizer,
@@ -71,9 +71,9 @@ model.compile(optimizer = optimizer,
 
 
 # training and evaluating model
-model_cp = model_utils.save_rnn_model_checkpoint(angle)
+model_cp = model_utils_casiaB.save_rnn_model_checkpoint(angle)
 change_lr = LearningRateScheduler(scheduler)
-early_stop = model_utils.set_early_stopping()
+early_stop = model_utils_casiaB.set_early_stopping()
 
 
 # fit

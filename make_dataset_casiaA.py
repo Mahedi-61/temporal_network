@@ -40,6 +40,7 @@ def handling_json_data_file(data):
         # for complete pose
         if(not is_partial_body):
             #frame_kps = hf.normalize_keypoints(pose_keypoints)
+
             #frame_kps = hf.get_body_limb(pose_keypoints)
             frame_kps = hf.get_joint_angle(pose_keypoints)
 
