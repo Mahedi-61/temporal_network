@@ -77,7 +77,7 @@ def is_partial_body(body_kps):
 # normalize body keypoints according to PTSN paper         
 def normalize_keypoints(body_kps):
 
-    body_joint = [9, 10, 11, 12, 13, 14] 
+    body_joint = [10, 11, 13, 14, 22, 19] 
     frame_kps = []
     
     # calculating distance between right_ankle and center of the hip
@@ -167,18 +167,19 @@ def get_body_limb(bkps):
     r_shoulder = get_distance(bkps, x_cor_neck, y_cor_neck, 
                                     x_cor_r_shoulder, y_cor_r_shoulder)
 
-    pose_limb = [r_foot, l_foot,
-                  r_run, l_run, r_body, l_body,
-                  r_hand, l_hand, r_arm, l_arm,
-                  l_shoulder, r_shoulder, nose_to_neck, hip]
-    
+    unit_length = get_distance(bkps, x_cor_neck, y_cor_neck,
+                                     x_cor_mid_hip, y_cor_mid_hip)
 
+
+    pose_limb = [r_feet, l_feet, r_foot, l_foot,
+                 nose_to_neck, r_run, l_run]
+    
     return pose_limb
 
 
 
 def get_motion_featurs(bkps_2, bkps_1):
-    body_joint = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14] 
+    body_joint = [0, 1, 8, 10, 11, 13, 14, 22, 19] 
     motion_features = []
 
     # for complete body pose of selected joints
@@ -198,9 +199,8 @@ def get_motion_featurs(bkps_2, bkps_1):
 
 def get_joint_angle(bkps):
     # first point lower, second point higher values
-    joint_pair = [(0, 1), (1, 2), (1, 5), (2, 3), (3, 4), 
-                  (5, 6), (6, 7), (1, 9), (1, 12), (9, 10),
-                  (10, 11), (12, 13), (13, 14)]
+    joint_pair = [(0, 1), (10, 11), (13, 14), (11, 22), (1, 2), (1, 5),
+                (9, 10), (12, 13), (14, 19)]
     
     angle_features = []
     for pair in joint_pair:

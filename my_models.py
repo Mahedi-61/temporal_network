@@ -12,7 +12,20 @@ import numpy as np
 
 # project modules
 from . import config
-weight_decay = 0.01
+
+if (config.working_dataset == "casiaA"):
+    nb_steps = config.casiaA_nb_steps
+    nb_features = config.casiaA_nb_features
+    nb_classes = config.casiaA_nb_classes
+    nn_model_path = config.casiaA_rnn_model_path
+
+
+elif(config.working_dataset == "casiaB"):
+    nb_steps = config.casiaB_nb_steps
+    nb_features = config.casiaB_nb_features
+    nb_classes = config.casiaB_nb_classes
+    rnn_model_path = config.casiaB_rnn_model_path
+
 
 
 ### special layer
@@ -24,7 +37,7 @@ class CenterLossLayer(Layer):
 
     def build(self, input_shape):
         self.centers = self.add_weight(name='centers',
-                            shape = (config.casiaB_nb_classes, config.nb_cells), # (class, features) (100, 20)
+                            shape = (nb_classes, config.nb_cells), # (class, features) (100, 20)
                             initializer = 'uniform',
                             trainable = True)
  
@@ -65,8 +78,8 @@ def temporal_network (x, labels):
             merge_mode = "sum")(x)
     
     # x --> (28, 80)
-    main = Dense(config.casiaB_nb_classes, 
-                    kernel_regularizer = regularizers.l2(weight_decay)) (x) 
+    main = Dense(nb_classes, 
+            kernel_regularizer = regularizers.l2(0.01)) (x) 
     
     main = BatchNormalization(momentum = 0.92, epsilon = 1e-5) (main)
     main = Activation('softmax')(main)
@@ -83,14 +96,14 @@ def temporal_network (x, labels):
 def get_temporal_model():
 
     ### compile
-    main_input = Input((config.casiaB_nb_steps, config.casiaB_nb_features))  #(28, 20)
-    aux_input = Input((config.casiaB_nb_steps, config.casiaB_nb_classes)) #(28, 100)
+    main_input = Input((nb_steps, nb_features))  #(28, 20)
+    aux_input = Input((nb_steps, nb_classes)) #(28, 100)
 
     final_output, side_output = temporal_network(main_input, aux_input)
     model = Model(inputs=[main_input, aux_input], outputs=[final_output, side_output])
 
     # saving as json file in model directory
-    open(config.casiaB_rnn_model_path, 'w').write(model.to_json())
+    open(rnn_model_path, 'w').write(model.to_json())
 
     print("model json saved !!")
     return model

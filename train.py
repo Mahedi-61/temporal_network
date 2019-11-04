@@ -1,4 +1,4 @@
-""" train a rnn network using pose sequence of Casia-B dataset"""
+""" train a rnn network using pose sequence of Casia dataset"""
 
 # python packages
 import numpy as np
@@ -10,17 +10,30 @@ from keras.callbacks import LearningRateScheduler
 
 
 # project modules
-from . import my_models_casiaB
-from . import model_utils_casiaB
+from . import my_models
+from . import model_utils
+from . import data_preparation_casiaA
 from . import data_preparation_casiaB
 from . import config
 
 
-def scheduler(epoch):
+def scheduler_casiaA(epoch):
+    if (epoch == 50):
+        K.set_value(model.optimizer.lr, config.lr_1)
+
+    elif (epoch == 320):
+        K.set_value(model.optimizer.lr, config.lr_2)
+
+        
+    print("learning rate: ", K.get_value(model.optimizer.lr))
+    return K.get_value(model.optimizer.lr)
+
+
+def scheduler_casiaB(epoch):
     if (epoch == 30):
         K.set_value(model.optimizer.lr, config.lr_1)
 
-    elif (epoch == 50):
+    elif (epoch == 60):
         K.set_value(model.optimizer.lr, config.lr_2)
 
     elif (epoch == 150):
@@ -36,25 +49,41 @@ def zero_loss(y_true, y_pred):
 
 
 # path variables and constant
-batch_size = 128
-nb_epochs = 200
-lr = config.learning_rate
-angle = config.angle_list[config.train_angle_nb]
+if config.working_dataset == "casiaA":
+    batch_size = 128
+    nb_epochs = 400
+    lr = config.learning_rate
+    angle = "90"
+
+    # loading traing and validation data
+    X_train, y_train = data_preparation_casiaA.load_data("train", angle)
+    X_valid, y_valid = data_preparation_casiaA.load_data("valid", angle)
+    change_lr = LearningRateScheduler(scheduler_casiaA)
 
 
-# loading traing and validation data
-X_train, y_train = data_preparation_casiaB.load_train_data_per_angle(angle)
+
+elif config.working_dataset == "casiaB":
+    batch_size = 128
+    nb_epochs = 200
+    lr = config.learning_rate
+    angle = config.angle_list[config.train_angle_nb]
+
+    # loading traing and validation data
+    X_train, y_train = data_preparation_casiaB.load_train_data_per_angle(angle)
+    X_valid, y_valid = data_preparation_casiaB.load_valid_data_per_angle(angle)
+    change_lr = LearningRateScheduler(scheduler_casiaB)
+
+
+
 print("\ntrian data shape: ", X_train.shape)
 print("train label shape: ", y_train.shape)
 
-
-X_valid, y_valid = data_preparation_casiaB.load_valid_data_per_angle(angle)
 print("\nvalid data shape: ", X_valid.shape)
 print("valid label shape: ", y_valid.shape)
 
 
 # constructing model
-model = my_models_casiaB.get_temporal_model()
+model = my_models.get_temporal_model()
 
 # train model once again
 #model = model_utils.read_rnn_model(angle)
@@ -71,9 +100,8 @@ model.compile(optimizer = optimizer,
 
 
 # training and evaluating model
-model_cp = model_utils_casiaB.save_rnn_model_checkpoint(angle)
-change_lr = LearningRateScheduler(scheduler)
-early_stop = model_utils_casiaB.set_early_stopping()
+model_cp = model_utils.save_rnn_model_checkpoint(angle)
+early_stop = model_utils.set_early_stopping()
 
 
 # fit

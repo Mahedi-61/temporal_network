@@ -16,7 +16,7 @@ from keras.utils import to_categorical
 
 # project modules
 from . import config
-from . import hand_features as hf
+from . import hand_features_casiaA as hf
 
 # for motion features
 first_frame_bkps = []

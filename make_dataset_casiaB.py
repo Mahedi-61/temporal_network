@@ -25,7 +25,7 @@ first_frame_bkps = []
 # formating json file
 def handling_json_data_file(data):
     global first_frame_bkps
-    frame_kps = []
+    combined_features = []
     is_no_people = False
     is_partial_body = False
     
@@ -40,11 +40,10 @@ def handling_json_data_file(data):
 
         # for complete pose
         if(not is_partial_body):
-            frame_kps = hf.normalize_keypoints(pose_keypoints)
-            #frame_kps = hf.get_body_limb(pose_keypoints)
-            #frame_kps = hf.get_joint_angle(pose_keypoints)
-
-            """
+            pose_features = hf.normalize_keypoints(pose_keypoints)
+            limb_features = hf.get_body_limb(pose_keypoints)
+            angle_features = hf.get_joint_angle(pose_keypoints)
+            
             # for first frame, store the  bpks and skip the motion feat.
             if(len(first_frame_bkps) == 0):
                 first_frame_bkps = pose_keypoints
@@ -52,11 +51,18 @@ def handling_json_data_file(data):
 
             else:
                 second_frame_bpks = pose_keypoints
-                frame_kps = hf.get_motion_featurs(second_frame_bpks, 
+                motion_features = hf.get_motion_featurs(second_frame_bpks, 
                                                   first_frame_bkps)
                 first_frame_bkps = second_frame_bpks
-            """
-    return frame_kps, is_no_people, is_partial_body
+        
+    # combining all fetures
+    if (not is_partial_body and not is_no_people):
+        combined_features += pose_features
+        combined_features += limb_features
+        combined_features += angle_features
+        combined_features += motion_features
+
+    return combined_features, is_no_people, is_partial_body
 
 
 

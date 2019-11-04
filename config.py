@@ -9,6 +9,8 @@ import os
 # project modules
 from ... import root_dir
 
+# set which dataset you are currently working
+working_dataset  = "casiaB"
 
 # path vairables and constant
 openpose_dir = os.path.join(root_dir.libs_path(), "openpose")
@@ -17,7 +19,6 @@ checkpoint_dir = os.path.join(root_dir.tn_path(), "checkpoint")
 
 casiaA_pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "casiaA_pose_data")
 casiaB_pose_data_dir = os.path.join(root_dir.tn_path(), "cache", "casiaB_pose_data")
-
 
 
 # train and validation sequence for gallery set
@@ -39,7 +40,7 @@ def get_casiaA_train_valid_seq(angle):
 
 # CASIA B
 casiaB_ls_gallery_train_seq =  ["nm01", "nm02", "nm03", "nm04"]
-casiaB_ls_gallery_valid_seq =  ["cl01", "cl02"]
+casiaB_ls_gallery_valid_seq =  ["bg01", "bg02"]
 
 
 # test sequence for probe set
@@ -54,7 +55,7 @@ angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
               "angle_144", "angle_162", "angle_180"]
 
 
-train_angle_nb = 0
+train_angle_nb = 1
 
 # model testing configuration
 # for CASIA A dataset
@@ -63,8 +64,9 @@ casiaA_nb_classes = 20
 casiaA_nb_angles = 3
 casiaA_nb_steps = 28
 
+
 # for CASIA B dataset
-casiaB_nb_features = 12
+casiaB_nb_features = 46 # (12, 7, 18, 9) (pose , limb, motion, angles)
 casiaB_nb_classes = 100
 casiaB_nb_angles = 11
 casiaB_nb_steps = 28
@@ -85,13 +87,11 @@ casiaB_rnn_model = "casiaB_rnn_model.json"
 casiaB_rnn_model_path = os.path.join(model_dir, casiaB_rnn_model)
 casiaB_rnn_model_weight = "casiaB_rnn_model_weight.h5"
 
-
 # network training parameter
 learning_rate = 1e-3 
 lr_1 = 5e-4
 lr_2 = 1e-4
 lr_3 = 5e-5
-
 
 # model utilites
 early_stopping = 200
