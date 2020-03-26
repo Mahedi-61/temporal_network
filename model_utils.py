@@ -18,8 +18,8 @@ from keras.callbacks import (EarlyStopping,
                              ReduceLROnPlateau)
 
 # project modules
-from ... import root_dir
-from . import config
+from .. import root_dir
+import config
 from .my_models import CenterLossLayer
  
 if (config.working_dataset == "casiaA"):
@@ -30,6 +30,12 @@ elif(config.working_dataset == "casiaB"):
     rnn_model_path = config.casiaB_rnn_model_path
     rnn_model_weight = config.casiaB_rnn_model_weight
 
+elif(config.working_dataset == "casiaB_3D"):
+    rnn_model_path = config.casiaB_3D_rnn_model_path
+    rnn_model_weight = config.casiaB_3D_rnn_model_weight
+
+
+
 
 # reading model
 def read_rnn_model(angle):
@@ -39,7 +45,7 @@ def read_rnn_model(angle):
     model = model_from_json(json_string, 
                     custom_objects={'CenterLossLayer': CenterLossLayer})
 
-    rnn_model_weight_path = os.path.join(config.model_dir,
+    rnn_model_weight_path = os.path.join(root_dir.model_path(),
                             angle + "_" + rnn_model_weight)
     
     model.load_weights(rnn_model_weight_path)
@@ -52,7 +58,7 @@ def read_rnn_model(angle):
 # saving checkpoint
 def save_rnn_model_checkpoint(angle):
 
-    rnn_model_weight_path = os.path.join(config.checkpoint_dir,
+    rnn_model_weight_path = os.path.join(root_dir.checkpoint_path(),
                             angle + "_" + rnn_model_weight)
     
     return ModelCheckpoint(rnn_model_weight_path,
@@ -68,7 +74,7 @@ def save_rnn_model_checkpoint(angle):
 # saving model
 def save_rnn_model_weight(model, angle):
 
-    rnn_model_weight_path = os.path.join(config.checkpoint_dir, 
+    rnn_model_weight_path = os.path.join(root_dir.checkpoint_path(), 
                             angle + "_" + rnn_model_weight)
 
     return model.save_weights(rnn_model_weight_path)
@@ -95,4 +101,4 @@ def set_early_stopping():
                                verbose = 2)
 
 if __name__ == "__main__":
-    read_rnn_model("0")
+    read_rnn_model()

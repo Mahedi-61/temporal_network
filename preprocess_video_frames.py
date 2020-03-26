@@ -1,8 +1,5 @@
 """
-# Project: gait_recognition
-# Author : Md. Mahedi Hasan
-# File : process_video_frames.py
-# Description : detecting and cropping bounding boxes on the input training images using darknet
+#Description : detecting and cropping bounding boxes on the input training images using darknet
 """
 
 # python packages

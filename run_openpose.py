@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 # project modules
-from ... import root_dir
+from .. import root_dir
 from . import config
 
 

@@ -26,6 +26,11 @@ elif(config.working_dataset == "casiaB"):
     nb_classes = config.casiaB_nb_classes
     rnn_model_path = config.casiaB_rnn_model_path
 
+elif(config.working_dataset == "casiaB_3D"):
+    nb_steps = config.casiaB_nb_steps
+    nb_features = config.casiaB_3D_nb_features
+    nb_classes = config.casiaB_nb_classes
+    rnn_model_path = config.casiaB_3D_rnn_model_path
 
 
 ### special layer

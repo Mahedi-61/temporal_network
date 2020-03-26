@@ -10,12 +10,12 @@ from prettytable import PrettyTable
 
 # project modules
 from . import model_utils
-from . import data_preparation
+from . import data_preparation_casiaB
 from . import config
 
 
 # path variables and constant
-batch_size = config.testing_batch_size
+batch_size = 128
 probe_type = str(sys.argv[1]) 
 
 # display options
@@ -55,7 +55,7 @@ def get_predicted_each_subject_with_trickery(y_true, y_pred):
     present_pointer = 0
     list_subject = []
     c = Counter(y_true)
-    sub_ts_length = [c.get(i) for i in range(62)]
+    sub_ts_length = [c.get(i) for i in range(config.casiaB_nb_classes)]
     
     for ts_len in sub_ts_length:
         
@@ -88,7 +88,7 @@ def get_predicted_each_subject(y_true, y_pred):
     present_pointer = 0
 
     c = Counter(y_true)
-    sub_ts_length = [c.get(i) for i in range(62)]
+    sub_ts_length = [c.get(i) for i in range(config.casiaB_nb_classes)]
     
     for ts_len in sub_ts_length:
         
@@ -110,15 +110,15 @@ def get_total_prediction(X_probe, y_probe, model):
     row = []
 
     # calculation for each angle
-    for p_angle in range(config.nb_angles):
+    for p_angle in range(config.casiaB_nb_angles):
 
-        print("\n\n**************", config.angle_list[p_angle], "**************")
+        print("\n\n**************", config.casiaB_angle_list[p_angle], "**************")
 
-        print("\n" + config.angle_list[p_angle], "probe data shape: ",
-                                                  X_probe[p_angle].shape)
+        print("\n" + config.casiaB_angle_list[p_angle], "probe data shape: ",
+                            X_probe[p_angle].shape)
         
-        print(config.angle_list[p_angle], "probe label shape: ",
-                                                  y_probe[p_angle].shape)
+        print(config.casiaB_angle_list[p_angle], "probe label shape: ",
+                            y_probe[p_angle].shape)
 
         # true label
         y_true = get_reduce_dimension(y_probe[p_angle])
@@ -137,14 +137,14 @@ def get_total_prediction(X_probe, y_probe, model):
         y_pred = get_prediction_all_ts(predictions)
 
         # get subject wise actual label and prediction
-        sub_wise_pred = get_predicted_each_subject_with_trickery(y_true, y_pred)
-        acutal_label = [i for i in range(62)]
+        sub_wise_pred = get_predicted_each_subject(y_true, y_pred)
+        acutal_label = [i for i in range(config.casiaB_nb_classes)]
 
         print("actual label:\n", acutal_label)
         print("\npredicted label\n", sub_wise_pred)
 
         acc_score = accuracy_score(acutal_label, sub_wise_pred)
-        print("\n", config.angle_list[p_angle], "accuracy: ", acc_score * 100)
+        print("\n", config.casiaB_angle_list[p_angle], "accuracy: ", acc_score * 100)
 
         row.append("{0:.4f}".format(acc_score * 100))
         
@@ -154,14 +154,14 @@ def get_total_prediction(X_probe, y_probe, model):
 
 ############################ main work here ############################
 # loading probe data
-probe_data, probe_label = data_preparation.load_probe_data(probe_type)
+probe_data, probe_label = data_preparation_casiaB.load_probe_data(probe_type)
 
 print("\n### test result of my rnn algorithm on CASIA Dataset-B ###")
 
-for data_angle in range(config.nb_angles):
+for data_angle in range(config.casiaB_nb_angles):
 
     # loading trained model
-    angle = config.angle_list[data_angle]
+    angle = config.casiaB_angle_list[data_angle]
     model = model_utils.read_rnn_model(angle)
 
     all_label = get_total_prediction (probe_data, probe_label, model)
@@ -178,7 +178,7 @@ print(table)
 
 """
 if __name__ == "__main__":
-    probe_data, probe_label = data_preparation.load_probe_data("nm")
+    probe_data, probe_label = data_preparation_casiaB.load_probe_data("nm")
     model = model_utils.read_rnn_model("angle_162")
     get_total_prediction (probe_data, probe_label, model)
 """

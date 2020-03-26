@@ -1,6 +1,5 @@
 """
-Author: Md Mahedi Hasan
-Description: Preprocess pose sequence dataset to feed rnn model
+Description: Preprocess 3D pose sequence dataset to feed rnn model
 Steps to do
         1. find out and sort partial body
         2. normalize keypoints
@@ -17,30 +16,37 @@ from keras.utils import to_categorical
 
 # project modules
 from . import config
-from . import hand_features_casiaB as hf
+from . import hand_features_casiaB_3D as hf
 
 # for motion features
 first_frame_bkps = []
 
 # formating json file
 def handling_json_data_file(data):
-    global first_frame_bkps
-    combined_features = []
-    is_no_people = False
-    is_partial_body = False
-    
-    # no people detected
-    if len(data["people"]) == 0:
-        is_no_people = True
+    seq_kps = []
 
-    # one people detected 
-    else:
-        pose_keypoints = data["people"][0]["pose_keypoints_2d"]
-        is_partial_body = hf.is_partial_body(pose_keypoints)
+    # for all the frames in the sequence
+    for frame in range(1, len(data) + 1):
+        pose_3D_keypoints = data[str(frame)]
+
+        global first_frame_bkps
+        combined_features = []
+        is_partial_body = False
+        body_kps = []
+
+        for i in range(0, 32): # total 32 joints
+            body_kps += pose_3D_keypoints[str(i)]['translate']
+
+        #print(body_kps)
+        is_partial_body = hf.is_partial_body(body_kps)
 
         # for complete pose
         if(not is_partial_body):
-            pose_features = hf.normalize_keypoints(pose_keypoints)
+            raw_3D_features = hf.normalize_keypoints(body_kps)
+
+            # adding into seqeunce vector
+            seq_kps.append(raw_3D_features)
+            """
             limb_features = hf.get_body_limb(pose_keypoints)
             angle_features = hf.get_joint_angle(pose_keypoints)
             
@@ -52,18 +58,19 @@ def handling_json_data_file(data):
             else:
                 second_frame_bpks = pose_keypoints
                 motion_features = hf.get_motion_featurs(second_frame_bpks, 
-                                                  first_frame_bkps)
+                                                    first_frame_bkps)
                 first_frame_bkps = second_frame_bpks
-        
-    # combining all fetures
-    if (not is_partial_body and not is_no_people):
-        combined_features += pose_features
-        combined_features += limb_features
-        combined_features += angle_features
-        combined_features += motion_features
-
-    return combined_features, is_no_people, is_partial_body
-
+            
+        # combining all fetures
+        if (not is_partial_body and not is_no_people):
+            combined_features += pose_features
+            combined_features += limb_features
+            combined_features += angle_features
+            combined_features += motion_features
+            """
+    print("total frame length in the sequence: ", len(seq_kps))
+    print("total missing frames ", len(data) - len(seq_kps))
+    return seq_kps
 
 
 # dataset formatted for rnn input
@@ -81,24 +88,28 @@ def get_format_data(subject_id,
     # for larger than 15 image sequene creating one timestep
     if(nb_images < config.casiaB_nb_steps):
         if ((config.casiaB_nb_steps - nb_images) > (config.casiaB_nb_steps / 2)):
-            nb_image_set = 0
+            nb_timestep = 0
 
         else:
-            nb_image_set = 1
-            seq_kps = seq_kps * 2
+            nb_timestep = 1
+            dummy_zeros = []
+
+            for i in range(0, (config.casiaB_nb_steps - nb_images)):
+                dummy_zeros.append(np.zeros(config.nb_features))
+
+            seq_kps = dummy_zeros + seq_kps
         
     else:
-        nb_image_set = int((nb_images - config.casiaB_nb_steps) / 
+        nb_timestep = int((nb_images - config.casiaB_nb_steps) / 
                             config.actual_fps) + 1
 
     # finding label of from subject data file
     sub_label = int(subject_id[1:]) - start_id
-    print(seq, "has total image:", nb_images, 
-            "  total image_set:", nb_image_set)
+    print(seq, "total image_set:", nb_timestep)
 
     # for some value of image_set
-    if(nb_image_set > 0):
-        for i in range(0, nb_image_set):
+    if(nb_timestep > 0):
+        for i in range(0, nb_timestep):
             start_frame_id = i * config.actual_fps
             end_frame_id = start_frame_id + config.casiaB_nb_steps
 
@@ -110,9 +121,11 @@ def get_format_data(subject_id,
         seq_data = np.array(seq_data)
         seq_label = np.array(seq_label)
 
-        seq_data = np.array(np.split(seq_data, nb_image_set))
-        seq_label = np.array(np.split(seq_label, nb_image_set))
+        seq_data = np.array(np.split(seq_data, nb_timestep))
+        seq_label = np.array(np.split(seq_label, nb_timestep))
 
+        print(seq_data.shape)
+        print(seq_label.shape)
     return seq_data, seq_label
 
 
@@ -135,11 +148,10 @@ def get_keypoints_for_all_subject(subject_id_list,
         sub_label = []
         
         sub_total_frame = 0
-        sub_total_no_people = 0
         sub_total_partial_body = 0
 
         # getting angle
-        subject_dir = os.path.join(config.casiaB_pose_data_dir, subject_id)
+        subject_dir = os.path.join(config.casiaB_3D_pose_data_dir, subject_id)
         num_angle =  len(angle_list)
         print("%s subject have: %d angle gait vidoes" % (subject_id, num_angle))
         
@@ -149,41 +161,23 @@ def get_keypoints_for_all_subject(subject_id_list,
             angle_data_list = []
             angle_label_list = []
             print("\n********** angle:", angle, "********** ")
-            
+        
             # considering each gait sequence
             for seq in walking_seq:
                 first_frame_bkps = []
-                seq_dir = os.path.join(subject_angle_dir, seq)
+                seq_file = os.path.join(subject_angle_dir, seq + ".json")
 
-                # setting directory
-                seq_kps = []
-                os.chdir(seq_dir)
+                with open(seq_file) as data_file:
+                    data = json.load(data_file)
+                    seq_kps = handling_json_data_file(data)
 
-                # getting all json files
-                json_files = sorted(glob.glob("*.json"))
-                sub_total_frame += len(json_files)
-                                   
-                for f, file in enumerate(json_files):
-                    with open(file) as data_file:
-                        data = json.load(data_file)
-                        
-                        frame_kps, no_people, partial_body = handling_json_data_file(data)
-                        #print("frame no: ", f+1); print(frame_kps)
-
-                        # counting no, multiple people and partial body detected
-                        if (no_people == True):  sub_total_no_people += 1
-                        elif (partial_body == True): sub_total_partial_body += 1
-                            
-                        # for single people save the frame key points
-                        else:
-                            seq_kps.append(frame_kps)
-                
                 # saving each seq walking data
                 seq_data, seq_label = get_format_data(subject_id,
                                                     seq_kps,
                                                     seq,
                                                     start_id)
-                
+        
+        
                 # adding each angle all seq data and label except empty list
                 if(seq_data != []):
                     angle_data_list.append(seq_data)
@@ -202,7 +196,7 @@ def get_keypoints_for_all_subject(subject_id_list,
                 # convert it to categorical value
                 sub_label.append(to_categorical(angle_label, 
                                 config.casiaB_nb_classes))
-
+        """
         # collecting all subject data
         total_dataset.append(sub_data)
         total_dataset_label.append(sub_label)
@@ -221,12 +215,11 @@ def get_keypoints_for_all_subject(subject_id_list,
         #### end of each subject work
 
     return total_dataset, total_dataset_label
+        """
 
 
 
 if __name__ == "__main__":
-    d, l = get_keypoints_for_all_subject(['p025', 'p026'],
-                                  ['nm05', 'nm06'],
-                                  'train',
-                                  25,
-                                  ["angle_018", "angle_036"])
+    get_keypoints_for_all_subject(['p050'],
+                                  ['nm03', 'nm04', 'nm05', 'nm06'],
+                                  'train', 50, ['angle_000'])
