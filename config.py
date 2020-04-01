@@ -47,6 +47,9 @@ casiaB_ls_probe_nm_seq = ["nm05", "nm06"]
 casiaB_ls_probe_bg_seq = ["bg01", "bg02"]
 casiaB_ls_probe_cl_seq = ["cl01", "cl02"]
 
+# all sequences
+casiaB_all_seq = ["nm01", "nm02", "nm03", "nm04", "nm05", 
+                  "nm06", "bg01", "bg02", "cl01", "cl02"]
 
 # angle
 casiaB_angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
@@ -63,7 +66,7 @@ casiaA_nb_steps = 28
 
 
 # for CASIA B dataset
-casiaB_nb_features = 39 # (12, 6, 18, 7) (pose , limb, motion, angles)
+casiaB_nb_features = 39# (12, 6, 18, 7) (pose , limb, motion, angles)
 casiaB_3D_nb_features = 12
 casiaB_nb_classes = 100
 casiaB_nb_angles = 11
@@ -89,6 +92,12 @@ casiaB_3D_rnn_model = "casiaB_3D_rnn_model.json"
 casiaB_3D_rnn_model_path = os.path.join(root_dir.model_path(), "casiaB_3D", casiaB_3D_rnn_model)
 casiaB_3D_rnn_model_weight = "casiaB_3D_rnn_model_weight.h5"
 
+#encoder
+casiaB_encoder_model = "casiaB_encoder_model.json"
+casiaB_encoder_model_path = os.path.join(root_dir.model_path(), "encoder", casiaB_3D_rnn_model)
+casiaB_encoder_model_weight = "casiaB_encoder_model_weight.h5"
+
+
 # network training parameter
 learning_rate = 1e-3 
 lr_1 = 5e-4
@@ -96,4 +105,4 @@ lr_2 = 1e-4
 lr_3 = 5e-5
 
 # model utilites
-early_stopping = 200
+early_stopping = 120

@@ -6,7 +6,7 @@ import os
 
 # project files
 from . import config
-from . import make_dataset_casiaB_new
+from . import make_dataset_casiaB
 
 # calculating total number of person having gait videos
 num_subject = len(os.listdir(config.casiaB_pose_data_dir))
@@ -30,7 +30,7 @@ print(subject_id_list)
 def load_train_data_per_angle(angle):
     print("\nstart preprocessing training data")
 
-    data, label = make_dataset_casiaB_new.get_keypoints_for_all_subject(
+    data, label = make_dataset_casiaB.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_gallery_train_seq,
                                         "train",
@@ -88,7 +88,7 @@ def load_data_per_angle(angle, data_type):
         seq = config.casiaB_ls_gallery_train_seq
 
     print("\nstart preprocessing validation data")
-    data, label = make_dataset_casiaB_new.get_keypoints_for_all_subject(
+    data, label = make_dataset_casiaB.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         seq,
                                         data_type,
@@ -116,7 +116,7 @@ def load_probe_data(data_type):
     
     # probe-normal test set
     if (data_type == "nm"):
-        data, label  = make_dataset_casiaB_new.get_keypoints_for_all_subject(
+        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_probe_nm_seq,
                                         data_type,
@@ -125,7 +125,7 @@ def load_probe_data(data_type):
 
     # probe-bag test set
     elif (data_type == "bg"):
-        data, label  = make_dataset_casiaB_new.get_keypoints_for_all_subject(
+        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_probe_bg_seq,
                                         data_type,
@@ -134,7 +134,7 @@ def load_probe_data(data_type):
 
     # probe-coat test set
     elif (data_type == "cl"):
-        data, label  = make_dataset_casiaB_new.get_keypoints_for_all_subject(
+        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_probe_cl_seq,
                                         data_type,
@@ -142,42 +142,73 @@ def load_probe_data(data_type):
                                         config.casiaB_angle_list)
 
 
-    elif(data_type == "train"):
-        data, label  = make_dataset_casiaB_new.get_keypoints_for_all_subject(
-                                        subject_id_list,
-                                        config.casiaB_ls_gallery_train_seq,
-                                        data_type,
-                                        start_id,
-                                        config.casiaB_angle_list)
-
     # storing all probeset angle numpy array into a list
     X_probe = []
     y_probe = []
 
-    if(data_type != "train"):
-        # logic for converting list to numpy array
-        for i in range(len(config.casiaB_angle_list)):
-            for s in range(config.casiaB_nb_classes):
-                if(s == 0):
-                    X_data = data[0][i]
-                    y_label = label[0][i]
-            
-                elif(not (s == 0)):
-                    X_data  = np.append(X_data, data[s][i], axis = 0)
-                    y_label = np.append(y_label, label[s][i], axis = 0)
-            
-            X_probe.append(X_data)
-            y_probe.append(y_label)
+    # logic for converting list to numpy array
+    for i in range(len(config.casiaB_angle_list)):
+        for s in range(config.casiaB_nb_classes):
+            if(s == 0):
+                X_data = data[0][i]
+                y_label = label[0][i]
+        
+            elif(not (s == 0)):
+                X_data  = np.append(X_data, data[s][i], axis = 0)
+                y_label = np.append(y_label, label[s][i], axis = 0)
+        
+        X_probe.append(X_data)
+        y_probe.append(y_label)
 
-            del X_data, y_label
+        del X_data, y_label
 
-        #X_probe --> (# of angles, # of ts, image_no, features)
-        return X_probe, y_probe
+    #X_probe --> (# of angles, # of ts, image_no, features)
+    return X_probe, y_probe
+
+
+
+def load_encoder_train_data(data_type):
+    start_id = 25
+    end_id = 124
+
+    subject_id_list = total_id_list[start_id-1:end_id]
+    ls_angle = config.casiaB_angle_list[3:4]
+
+    if(data_type == "train"):
+        ls_seq = config.casiaB_all_seq 
+        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
+                                        subject_id_list,
+                                        ls_seq,
+                                        data_type,
+                                        start_id,
+                                        ls_angle)
+
+    elif(data_type == "valid"):
+        ls_seq = config.casiaB_ls_probe_bg_seq 
+        ls_angle = ["angle_054"]
+        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
+                                        subject_id_list,
+                                        ls_seq,
+                                        data_type,
+                                        start_id,
+                                        ls_angle)
+
+
+    # logic for converting list to numpy array
+    for s in range(config.casiaB_nb_classes):
+        for i in range(0, len(ls_angle)):
+            if(s == 0 and i == 0):
+                X_data = data[0][i]
+                y_label = label[0][i]
+        
+            else:
+                X_data  = np.append(X_data, data[s][i], axis = 0)
+                y_label = np.append(y_label, label[s][i], axis = 0)
     
-    else: return data, label 
-
+    del data, label
+    return X_data, y_label
 
 
 if __name__ == "__main__":
-    d, l = load_data_per_angle(config.casiaB_angle_list[3], 'train')
-    print(l.shape)
+    d, l = load_encoder_train_data('valid')
+    #print(l[326][0])

@@ -157,11 +157,12 @@ def get_total_prediction(X_probe, y_probe, model):
 probe_data, probe_label = data_preparation_casiaB.load_probe_data(probe_type)
 
 print("\n### test result of my rnn algorithm on CASIA Dataset-B ###")
-for data_angle in range(config.casiaB_nb_angles):
+
+for data_angle in range(2,4): #config.casiaB_nb_angles):
 
     # loading trained model
     angle = config.casiaB_angle_list[data_angle]
-    model = model_utils.read_rnn_model(angle)
+    model = model_utils.read_encoder_model(angle)
 
     all_label = get_total_prediction (probe_data, probe_label, model)
 

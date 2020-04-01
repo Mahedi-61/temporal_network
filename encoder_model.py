@@ -1,5 +1,7 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 from keras.models import Model
-from keras.layers import (Input, Dense, LSTM, Lambda, TimeDistributed, GRU, 
+from keras.layers import (Input, Dense, LSTM, Lambda, TimeDistributed, GRU, Dropout,
                           BatchNormalization, Bidirectional, Activation)
 
 from keras import regularizers
@@ -13,24 +15,10 @@ import numpy as np
 # project modules
 from . import config
 
-if (config.working_dataset == "casiaA"):
-    nb_steps = config.casiaA_nb_steps
-    nb_features = config.casiaA_nb_features
-    nb_classes = config.casiaA_nb_classes
-    nn_model_path = config.casiaA_rnn_model_path
 
-
-elif(config.working_dataset == "casiaB"):
-    nb_steps = config.casiaB_nb_steps
-    nb_features = config.casiaB_nb_features
-    nb_classes = config.casiaB_nb_classes
-    rnn_model_path = config.casiaB_rnn_model_path
-
-elif(config.working_dataset == "casiaB_3D"):
-    nb_steps = config.casiaB_nb_steps
-    nb_features = config.casiaB_3D_nb_features
-    nb_classes = config.casiaB_nb_classes
-    rnn_model_path = config.casiaB_3D_rnn_model_path
+nb_steps = config.casiaB_nb_steps
+nb_features = config.casiaB_nb_features
+nb_classes = config.casiaB_nb_classes
 
 
 ### special layer
@@ -71,21 +59,18 @@ class CenterLossLayer(Layer):
 
 ### model
 def temporal_network (x, labels):
-    x = BatchNormalization(momentum = 0.92,
-                    epsilon = 1e-5)(x)
+    x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
     #
     # hidden GRU layers
     for i in range(config.nb_layers):
         x = Bidirectional(GRU(
             config.nb_cells,
             return_sequences = True,
-            stateful = False),
-            merge_mode = "sum")(x)
+            stateful = False), merge_mode= "sum")(x)
     
-    # x --> (28, 80)
-    main = Dense(nb_classes, 
-            kernel_regularizer = regularizers.l2(0.01)) (x) 
-    
+    main = Dense(130,  kernel_regularizer = regularizers.l2(0.01)) (x) 
+    main = Dropout(rate = 0.3)(main) 
+    main = Dense(nb_classes,  kernel_regularizer = regularizers.l2(0.01)) (main)     
     main = BatchNormalization(momentum = 0.92, epsilon = 1e-5) (main)
     main = Activation('softmax')(main)
 
@@ -108,7 +93,7 @@ def get_temporal_model():
     model = Model(inputs=[main_input, aux_input], outputs=[final_output, side_output])
 
     # saving as json file in model directory
-    open(rnn_model_path, 'w').write(model.to_json())
+    open(config.casiaB_encoder_model_path, 'w').write(model.to_json())
 
     print("model json saved !!")
     return model
