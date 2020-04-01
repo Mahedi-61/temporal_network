@@ -2,6 +2,7 @@
 
 # python packages
 import numpy as np
+import sys
 from keras import backend as K
 from keras.utils import to_categorical
 from keras.optimizers import Adam
@@ -30,10 +31,10 @@ def scheduler_casiaA(epoch):
 
 
 def scheduler_casiaB(epoch):
-    if (epoch == 30):
+    if (epoch == 40):
         K.set_value(model.optimizer.lr, config.lr_1)
 
-    elif (epoch == 60):
+    elif (epoch == 90):
         K.set_value(model.optimizer.lr, config.lr_2)
 
     elif (epoch == 150):
@@ -66,11 +67,15 @@ elif config.working_dataset == "casiaB":
     batch_size = 128
     nb_epochs = 200
     lr = config.learning_rate
-    angle = config.angle_list[config.train_angle_nb]
+    angle = config.casiaB_angle_list[(int(sys.argv[1]))]
 
     # loading traing and validation data
-    X_train, y_train = data_preparation_casiaB.load_train_data_per_angle(angle)
-    X_valid, y_valid = data_preparation_casiaB.load_valid_data_per_angle(angle)
+    X_train, y_train = data_preparation_casiaB.load_data_per_angle(
+                        angle, "train")
+
+    X_valid, y_valid = data_preparation_casiaB.load_data_per_angle(
+                        angle, "valid")
+
     change_lr = LearningRateScheduler(scheduler_casiaB)
 
 

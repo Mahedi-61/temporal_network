@@ -1,5 +1,4 @@
 """
-Author: Md Mahedi Hasan
 Description: this file contains code for handling rnn model utilities
 Notes:
 # all models are palced and stored in model directory
@@ -19,7 +18,7 @@ from keras.callbacks import (EarlyStopping,
 
 # project modules
 from .. import root_dir
-import config
+from . import config
 from .my_models import CenterLossLayer
  
 if (config.working_dataset == "casiaA"):
@@ -45,7 +44,7 @@ def read_rnn_model(angle):
     model = model_from_json(json_string, 
                     custom_objects={'CenterLossLayer': CenterLossLayer})
 
-    rnn_model_weight_path = os.path.join(root_dir.model_path(),
+    rnn_model_weight_path = os.path.join(root_dir.model_path(), "casiaB_2D",
                             angle + "_" + rnn_model_weight)
     
     model.load_weights(rnn_model_weight_path)
@@ -62,7 +61,7 @@ def save_rnn_model_checkpoint(angle):
                             angle + "_" + rnn_model_weight)
     
     return ModelCheckpoint(rnn_model_weight_path,
-                monitor = 'val_activation_1_acc',
+                monitor = 'val_activation_1_accuracy',
                 verbose = 2,
                 save_best_only = True,
                 save_weights_only = True,
@@ -101,4 +100,4 @@ def set_early_stopping():
                                verbose = 2)
 
 if __name__ == "__main__":
-    read_rnn_model()
+    read_rnn_model(config.casiaB_angle_list[0])

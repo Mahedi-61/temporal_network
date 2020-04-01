@@ -1,5 +1,4 @@
 """
-Author: Md Mahedi Hasan
 Description: generating frames from given video files
 """
 
@@ -9,14 +8,11 @@ import os
 
 
 # project modules
-from ... import root_dir
-
-
+from .. import root_dir
 
 # declaring path variables
 input_dir = root_dir.casia_gait_dataset_B()
-output_dir = os.path.join(root_dir.data_path(), "video_frames")
-
+output_dir = os.path.join(root_dir.data_path(), "CasiaB_frames")
 
 
 # for training CASIA-B Dataset
@@ -73,7 +69,6 @@ def gen_video_frames(ls_video_files):
         os.makedirs(save_angle_dir, exist_ok = True)
 
 
-
         # making all frame sequence per subject
         for i, input_file in enumerate(video_files):
             
@@ -102,14 +97,13 @@ def gen_video_frames(ls_video_files):
         
 
 
-
-
 # set training subject id (including end id)
-start_id = 94
-end_id = 124
+start_id = 1
+end_id = 24
 
 # getting associated video files
 ls_video_files = get_all_video_files_for_train (start_id, end_id)
 
+print(ls_video_files)
 # making video frames for given videos
 gen_video_frames(ls_video_files)

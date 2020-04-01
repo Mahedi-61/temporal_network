@@ -34,9 +34,9 @@ z_cor_r_hip = (1 * 3) + 2
 
 
 # mid hip
-x_cor_mid_hip = (0 * 3)
-y_cor_mid_hip = (0 * 3) + 1
-z_cor_mid_hip = (0 * 3) + 2
+x_cor_mid_hip = (11 * 3)
+y_cor_mid_hip = (11 * 3) + 1
+z_cor_mid_hip = (11 * 3) + 2
 
 
 # left hip
@@ -73,7 +73,7 @@ def is_partial_body(body_kps):
 # normalize body keypoints according to PTSN paper         
 def normalize_keypoints(body_kps):
 
-    body_joint = [1, 2, 3, 6, 7, 8, 23, 29, 13, 14] 
+    body_joint = [2, 3, 7, 8] 
     frame_kps = []
     
     # calculating distance between right_ankle and center of the hip
@@ -86,9 +86,9 @@ def normalize_keypoints(body_kps):
         z_cor = (b_j * 3) + 2
         
         # subtract join from the neck
-        norm_x =  (body_kps[x_cor])  #- body_kps[x_cor_mid_hip]) 
-        norm_y =  (body_kps[y_cor]) #- body_kps[y_cor_mid_hip])
-        norm_z =  (body_kps[z_cor]) #- body_kps[z_cor_mid_hip])
+        norm_x =  (body_kps[x_cor]) #- body_kps[x_cor_neck]) 
+        norm_y =  (body_kps[y_cor]) #- body_kps[y_cor_neck])
+        norm_z =  (body_kps[z_cor]) #- body_kps[z_cor_neck])
 
         # without normalize
         frame_kps.append(norm_x)

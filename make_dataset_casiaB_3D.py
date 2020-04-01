@@ -68,7 +68,7 @@ def handling_json_data_file(data):
             combined_features += angle_features
             combined_features += motion_features
             """
-    print("total frame length in the sequence: ", len(seq_kps))
+    print("\ntotal frame length in the sequence: ", len(seq_kps))
     print("total missing frames ", len(data) - len(seq_kps))
     return seq_kps
 
@@ -95,7 +95,7 @@ def get_format_data(subject_id,
             dummy_zeros = []
 
             for i in range(0, (config.casiaB_nb_steps - nb_images)):
-                dummy_zeros.append(np.zeros(config.nb_features))
+                dummy_zeros.append(np.zeros(config.casiaB_3D_nb_features))
 
             seq_kps = dummy_zeros + seq_kps
         
@@ -118,14 +118,14 @@ def get_format_data(subject_id,
                 seq_data.append(seq_kps[line])
                 seq_label.append([sub_label])
 
+
+        seq_data = np.split(np.array(seq_data), nb_timestep)
+        seq_label = np.split(np.array(seq_label), nb_timestep)
+
         seq_data = np.array(seq_data)
-        seq_label = np.array(seq_label)
+        seq_label = to_categorical(seq_label, config.casiaB_nb_classes)
+        seq_label = np.squeeze(seq_label, axis = 2)
 
-        seq_data = np.array(np.split(seq_data, nb_timestep))
-        seq_label = np.array(np.split(seq_label, nb_timestep))
-
-        print(seq_data.shape)
-        print(seq_label.shape)
     return seq_data, seq_label
 
 
@@ -146,9 +146,6 @@ def get_keypoints_for_all_subject(subject_id_list,
         # variable for each subject
         sub_data = []
         sub_label = []
-        
-        sub_total_frame = 0
-        sub_total_partial_body = 0
 
         # getting angle
         subject_dir = os.path.join(config.casiaB_3D_pose_data_dir, subject_id)
@@ -173,12 +170,10 @@ def get_keypoints_for_all_subject(subject_id_list,
 
                 # saving each seq walking data
                 seq_data, seq_label = get_format_data(subject_id,
-                                                    seq_kps,
-                                                    seq,
-                                                    start_id)
+                                                    seq_kps, seq, start_id)
         
         
-                # adding each angle all seq data and label except empty list
+                # adding each angle all seq data and lable except empty list
                 if(seq_data != []):
                     angle_data_list.append(seq_data)
                     angle_label_list.append(seq_label)
@@ -192,34 +187,24 @@ def get_keypoints_for_all_subject(subject_id_list,
                 print("angle label shape:", angle_label.shape)
 
                 sub_data.append(angle_data)
-                
-                # convert it to categorical value
-                sub_label.append(to_categorical(angle_label, 
-                                config.casiaB_nb_classes))
-        """
+                sub_label.append(angle_label)
+        
+
         # collecting all subject data
         total_dataset.append(sub_data)
         total_dataset_label.append(sub_label)
         
         # per subject display info
-        print("\nsubject id", subject_id, "has total image set:", 
+        print("\n\nsubject id", subject_id, "has total image set:", 
                                     sum(len(i) for i in sub_data))
         
-        print("total frame:", sub_total_frame)
-        sub_single_people = sub_total_frame - (sub_total_no_people +
-                                               sub_total_partial_body)
-        
-        print("suitable frame for detection:", sub_single_people)
-        print("no people detected:", sub_total_no_people)
-        print("partial people detected:", sub_total_partial_body)
         #### end of each subject work
-
     return total_dataset, total_dataset_label
-        """
+        
 
 
 
 if __name__ == "__main__":
-    get_keypoints_for_all_subject(['p050'],
+    get_keypoints_for_all_subject(['p050', 'p051'],
                                   ['nm03', 'nm04', 'nm05', 'nm06'],
                                   'train', 50, ['angle_000'])

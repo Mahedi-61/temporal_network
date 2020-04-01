@@ -103,9 +103,11 @@ def normalize_keypoints(body_kps):
     return frame_kps
 
 
+
 def get_distance(bkps, x1, y1, x2, y2):
     dist = np.sqrt((bkps[x1] - bkps[x2]) ** 2 + (bkps[y1] - bkps[y2]) ** 2)
     return dist
+
 
 
 def get_body_limb(bkps):
@@ -171,15 +173,14 @@ def get_body_limb(bkps):
                                      x_cor_mid_hip, y_cor_mid_hip)
 
 
-    pose_limb = [r_feet, l_feet, r_foot, l_foot,
-                 nose_to_neck, r_run, l_run]
+    pose_limb = [r_feet, l_feet, r_foot, l_foot, r_run, l_run]
     
     return pose_limb
 
 
 
 def get_motion_featurs(bkps_2, bkps_1):
-    body_joint = [0, 1, 8, 10, 11, 13, 14, 22, 19] 
+    body_joint = [0, 1, 8, 10, 11, 13, 14] #, 22, 19] 
     motion_features = []
 
     # for complete body pose of selected joints
@@ -197,10 +198,10 @@ def get_motion_featurs(bkps_2, bkps_1):
     return motion_features
 
 
+
 def get_joint_angle(bkps):
     # first point lower, second point higher values
-    joint_pair = [(0, 1), (10, 11), (13, 14), (11, 22), (1, 2), (1, 5),
-                (9, 10), (12, 13), (14, 19)]
+    joint_pair = [(0, 1), (10, 11), (13, 14), (11, 22), (9, 10), (12, 13), (14, 19)]
     
     angle_features = []
     for pair in joint_pair:

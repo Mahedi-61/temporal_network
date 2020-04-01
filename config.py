@@ -9,7 +9,7 @@ import os
 from .. import root_dir
 
 # set which dataset you are currently working
-working_dataset  = "casiaB_3D"
+working_dataset  = "casiaB"
 
 # path vairables and constant
 openpose_dir = os.path.join(root_dir.libs_path(), "openpose")
@@ -53,7 +53,6 @@ casiaB_angle_list = ["angle_000", "angle_018", "angle_036", "angle_054",
               "angle_072", "angle_090", "angle_108", "angle_126",
               "angle_144", "angle_162", "angle_180"]
 
-train_angle_nb = 10
 
 # model testing configuration
 # for CASIA A dataset
@@ -64,8 +63,8 @@ casiaA_nb_steps = 28
 
 
 # for CASIA B dataset
-casiaB_nb_features = 46 # (12, 7, 18, 9) (pose , limb, motion, angles)
-casiaB_3D_nb_features = 30
+casiaB_nb_features = 39 # (12, 6, 18, 7) (pose , limb, motion, angles)
+casiaB_3D_nb_features = 12
 casiaB_nb_classes = 100
 casiaB_nb_angles = 11
 casiaB_nb_steps = 28
@@ -79,15 +78,15 @@ nb_cells = 100
 
 # model and their weights name
 casiaA_rnn_model = "casiaA_rnn_model.json"
-casiaA_rnn_model_path = os.path.join(root_dir.model_path(), casiaA_rnn_model)
+casiaA_rnn_model_path = os.path.join(root_dir.model_path(), "casiaA", casiaA_rnn_model)
 casiaA_rnn_model_weight = "casiaA_rnn_model_weight.h5"
 
 casiaB_rnn_model = "casiaB_rnn_model.json"
-casiaB_rnn_model_path = os.path.join(root_dir.model_path(), casiaB_rnn_model)
+casiaB_rnn_model_path = os.path.join(root_dir.model_path(), "casiaB_2D", casiaB_rnn_model)
 casiaB_rnn_model_weight = "casiaB_rnn_model_weight.h5"
 
 casiaB_3D_rnn_model = "casiaB_3D_rnn_model.json"
-casiaB_3D_rnn_model_path = os.path.join(root_dir.model_path(), casiaB_3D_rnn_model)
+casiaB_3D_rnn_model_path = os.path.join(root_dir.model_path(), "casiaB_3D", casiaB_3D_rnn_model)
 casiaB_3D_rnn_model_weight = "casiaB_3D_rnn_model_weight.h5"
 
 # network training parameter

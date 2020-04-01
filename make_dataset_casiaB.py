@@ -1,5 +1,4 @@
 """
-Author: Md Mahedi Hasan
 Description: Preprocess pose sequence dataset to feed rnn model
 Steps to do
         1. find out and sort partial body
@@ -21,6 +20,7 @@ from . import hand_features_casiaB as hf
 
 # for motion features
 first_frame_bkps = []
+
 
 # formating json file
 def handling_json_data_file(data):
@@ -66,6 +66,7 @@ def handling_json_data_file(data):
 
 
 
+
 # dataset formatted for rnn input
 def get_format_data(subject_id,
                     seq_kps,
@@ -74,31 +75,34 @@ def get_format_data(subject_id,
 
     seq_data = []
     seq_label = []
-    
-    # check how many image frame of length 28 we can get
     nb_images = len(seq_kps)
 
     # for larger than 15 image sequene creating one timestep
     if(nb_images < config.casiaB_nb_steps):
         if ((config.casiaB_nb_steps - nb_images) > (config.casiaB_nb_steps / 2)):
-            nb_image_set = 0
+            nb_timestep = 0
 
         else:
-            nb_image_set = 1
-            seq_kps = seq_kps * 2
+            nb_timestep = 1
+            dummy_zeros = []
+
+            for i in range(0, (config.casiaB_nb_steps - nb_images)):
+                dummy_zeros.append(np.zeros(config.casiaB_nb_features))
+
+            seq_kps = dummy_zeros + seq_kps
+
         
     else:
-        nb_image_set = int((nb_images - config.casiaB_nb_steps) / 
+        nb_timestep = int((nb_images - config.casiaB_nb_steps) / 
                             config.actual_fps) + 1
 
     # finding label of from subject data file
     sub_label = int(subject_id[1:]) - start_id
-    print(seq, "has total image:", nb_images, 
-            "  total image_set:", nb_image_set)
+    print(seq, " total timestep: ", nb_timestep)
 
     # for some value of image_set
-    if(nb_image_set > 0):
-        for i in range(0, nb_image_set):
+    if(nb_timestep > 0):
+        for i in range(0, nb_timestep):
             start_frame_id = i * config.actual_fps
             end_frame_id = start_frame_id + config.casiaB_nb_steps
 
@@ -110,8 +114,8 @@ def get_format_data(subject_id,
         seq_data = np.array(seq_data)
         seq_label = np.array(seq_label)
 
-        seq_data = np.array(np.split(seq_data, nb_image_set))
-        seq_label = np.array(np.split(seq_label, nb_image_set))
+        seq_data = np.array(np.split(seq_data, nb_timestep))
+        seq_label = np.array(np.split(seq_label, nb_timestep))
 
     return seq_data, seq_label
 
@@ -185,7 +189,7 @@ def get_keypoints_for_all_subject(subject_id_list,
                                                     start_id)
                 
                 # adding each angle all seq data and label except empty list
-                if(seq_data != []):
+                if(len(seq_data) != 0):
                     angle_data_list.append(seq_data)
                     angle_label_list.append(seq_label)
   
@@ -194,14 +198,14 @@ def get_keypoints_for_all_subject(subject_id_list,
                 angle_data = np.vstack(angle_data_list)
                 angle_label = np.vstack(angle_label_list)
 
+                angle_label = to_categorical(angle_label, config.casiaB_nb_classes)
+                #angle_label = np.squeeze(angle_label, axis = 2)
+
                 print("angle data shape:", angle_data.shape)
                 print("angle label shape:", angle_label.shape)
 
                 sub_data.append(angle_data)
-                
-                # convert it to categorical value
-                sub_label.append(to_categorical(angle_label, 
-                                config.casiaB_nb_classes))
+                sub_label.append(angle_label)
 
         # collecting all subject data
         total_dataset.append(sub_data)

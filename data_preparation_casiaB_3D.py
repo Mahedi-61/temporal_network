@@ -6,18 +6,17 @@ import os
 
 # project files
 from . import config
-from . import make_dataset_casiaB
+from . import make_dataset_casiaB_3D
 
 # calculating total number of person having gait videos
-num_subject = len(os.listdir(config.casiaB_pose_data_dir))
+num_subject = len(os.listdir(config.casiaB_3D_pose_data_dir))
 print("\ntotal number subjects: ", num_subject)
 
-total_id_list = sorted(os.listdir(config.casiaB_pose_data_dir), 
+total_id_list = sorted(os.listdir(config.casiaB_3D_pose_data_dir), 
                 key = lambda x: int(x[1:]))
 
 print("subject id list: 25 to 124")
 subject_id_list = total_id_list
-print(subject_id_list)
 
 # for label synchronization
 start_id = 25
@@ -27,7 +26,7 @@ start_id = 25
 def load_train_data_per_angle(angle):
     print("\nstart preprocessing training data")
 
-    data, label = make_dataset_casiaB.get_keypoints_for_all_subject(
+    data, label = make_dataset_casiaB_3D.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_gallery_train_seq,
                                         "train",
@@ -45,7 +44,7 @@ def load_train_data_per_angle(angle):
 
     X_train = np.ndarray(((max_ts * config.casiaB_nb_classes),
                           config.casiaB_nb_steps,
-                          config.casiaB_nb_features), dtype = np.float32)
+                          config.casiaB_3D_nb_features), dtype = np.float32)
 
     y_train = np.ndarray(((max_ts * config.casiaB_nb_classes),
                           config.casiaB_nb_steps,
@@ -76,12 +75,12 @@ def load_train_data_per_angle(angle):
 
 
 
-def load_valid_data_per_angle(angle):
+def load_data_per_angle(gait_seq, angle):
     
     print("\nstart preprocessing validation data")
-    data, label = make_dataset_casiaB.get_keypoints_for_all_subject(
+    data, label = make_dataset_casiaB_3D.get_keypoints_for_all_subject(
                                         subject_id_list,
-                                        config.casiaB_ls_gallery_valid_seq,
+                                        gait_seq,
                                         "valid",
                                         start_id,
                                         [angle])
@@ -107,7 +106,7 @@ def load_probe_data(data_type):
     
     # probe-normal test set
     if (data_type == "nm"):
-        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
+        data, label  = make_dataset_casiaB_3D.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_probe_nm_seq,
                                         data_type,
@@ -116,7 +115,7 @@ def load_probe_data(data_type):
 
     # probe-bag test set
     elif (data_type == "bg"):
-        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
+        data, label  = make_dataset_casiaB_3D.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_probe_bg_seq,
                                         data_type,
@@ -125,7 +124,7 @@ def load_probe_data(data_type):
 
     # probe-coat test set
     elif (data_type == "cl"):
-        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
+        data, label  = make_dataset_casiaB_3D.get_keypoints_for_all_subject(
                                         subject_id_list,
                                         config.casiaB_ls_probe_cl_seq,
                                         data_type,
@@ -158,5 +157,6 @@ def load_probe_data(data_type):
 
 
 if __name__ == "__main__":
-    d, l = load_probe_data('cl')
-    print(l[0][0][0])
+    gait_seq = config.casiaB_ls_gallery_train_seq
+    d, l = load_probe_data('nm')
+    print(l[0][1000][0])
