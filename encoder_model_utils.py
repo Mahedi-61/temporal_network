@@ -23,7 +23,7 @@ from .encoder_model  import CenterLossLayer
 
 
 # reading encoder model
-def read_encoder_model(angle):
+def read_encoder_model(group):
     print("\nreading stored rnn model architecture and weight ...")
     
     json_string = open(config.casiaB_encoder_model_path).read()
@@ -31,7 +31,7 @@ def read_encoder_model(angle):
                     custom_objects={'CenterLossLayer': CenterLossLayer})
 
     encoder_model_weight_path = os.path.join(root_dir.model_path(), "encoder",
-                                angle + "_" + config.casiaB_encoder_model_weight)
+                                group + "_" + config.casiaB_encoder_model_weight)
     
     model.load_weights(encoder_model_weight_path)
     
@@ -40,13 +40,13 @@ def read_encoder_model(angle):
 
 
 # saving checkpoint
-def save_encoder_model_checkpoint(angle):
+def save_encoder_model_checkpoint(group):
 
     encoder_model_weight_path = os.path.join(root_dir.checkpoint_path(),
-                                angle + "_" + config.casiaB_encoder_model_weight)
+                                group + "_" + config.casiaB_encoder_model_weight)
     
     return ModelCheckpoint(encoder_model_weight_path,
-                monitor = 'val_activation_1_accuracy',
+                monitor = 'val_loss',
                 verbose = 2,
                 save_best_only = True,
                 save_weights_only = True,
@@ -74,4 +74,5 @@ def set_early_stopping():
                                verbose = 2)
 
 if __name__ == "__main__":
-    read_encoder_model(config.casiaB_angle_list[1])
+    pass
+    #read_encoder_model()

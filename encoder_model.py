@@ -1,7 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 from keras.models import Model
-from keras.layers import (Input, Dense, LSTM, Lambda, TimeDistributed, GRU, Dropout,
+from keras.layers import (Input, Dense, LSTM, Lambda, TimeDistributed, GRU, Dropout, RepeatVector,
                           BatchNormalization, Bidirectional, Activation)
 
 from keras import regularizers
@@ -82,7 +82,6 @@ def temporal_network (x, labels):
     return main, side
 
 
-
 def get_temporal_model():
 
     ### compile
@@ -99,6 +98,45 @@ def get_temporal_model():
     return model
 
 
+
+def autoencoder_network (x):
+    x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
+
+    # hidden GRU layers
+    x = GRU(config.nb_encoder_cells, return_sequences = True)(x)
+    x = GRU(80, return_sequences = False)(x)
+    encoder_out = RepeatVector(nb_steps) (x)
+
+    x = GRU(80, return_sequences = True)(encoder_out)
+    x = GRU(config.nb_encoder_cells,return_sequences = True)(x)
+
+    decoder_out = TimeDistributed(Dense(nb_features,  
+                kernel_regularizer = regularizers.l2(0.01))) (x) 
+
+    return encoder_out, decoder_out 
+
+
+
+def get_autoencoder():
+
+    ### compile
+    main_input = Input((nb_steps, nb_features))  #(28, 39)
+
+    encoder_out, final_output = autoencoder_network(main_input)
+
+    encoder_model =  Model(inputs=[main_input], outputs=[encoder_out])
+    autoencoder_model = Model(inputs=[main_input], outputs=[final_output])
+
+    # saving as json file in model directory
+    open(config.casiaB_encoder_model_path, 'w').write(autoencoder_model.to_json())
+
+    print("model json saved !!")
+    return autoencoder_model
+
+
+
+
+
 if __name__ == "__main__":
-    model = get_temporal_model()
+    model = get_autoencoder()
     model.summary()

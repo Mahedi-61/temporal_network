@@ -167,48 +167,8 @@ def load_probe_data(data_type):
 
 
 
-def load_encoder_train_data(data_type):
-    start_id = 25
-    end_id = 124
-
-    subject_id_list = total_id_list[start_id-1:end_id]
-    ls_angle = config.casiaB_angle_list[3:4]
-
-    if(data_type == "train"):
-        ls_seq = config.casiaB_all_seq 
-        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
-                                        subject_id_list,
-                                        ls_seq,
-                                        data_type,
-                                        start_id,
-                                        ls_angle)
-
-    elif(data_type == "valid"):
-        ls_seq = config.casiaB_ls_probe_bg_seq 
-        ls_angle = ["angle_054"]
-        data, label  = make_dataset_casiaB.get_keypoints_for_all_subject(
-                                        subject_id_list,
-                                        ls_seq,
-                                        data_type,
-                                        start_id,
-                                        ls_angle)
-
-
-    # logic for converting list to numpy array
-    for s in range(config.casiaB_nb_classes):
-        for i in range(0, len(ls_angle)):
-            if(s == 0 and i == 0):
-                X_data = data[0][i]
-                y_label = label[0][i]
-        
-            else:
-                X_data  = np.append(X_data, data[s][i], axis = 0)
-                y_label = np.append(y_label, label[s][i], axis = 0)
-    
-    del data, label
-    return X_data, y_label
-
 
 if __name__ == "__main__":
-    d, l = load_encoder_train_data('valid')
+    pass
+    #d, l = load_encoder_train_data('valid')
     #print(l[326][0])

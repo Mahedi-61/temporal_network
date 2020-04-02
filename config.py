@@ -66,7 +66,7 @@ casiaA_nb_steps = 28
 
 
 # for CASIA B dataset
-casiaB_nb_features = 39# (12, 6, 18, 7) (pose , limb, motion, angles)
+casiaB_nb_features = 12# (12, 6, 18, 7) (pose , limb, motion, angles)
 casiaB_3D_nb_features = 12
 casiaB_nb_classes = 100
 casiaB_nb_angles = 11
@@ -77,6 +77,7 @@ casiaB_nb_steps = 28
 actual_fps = 4  #frame per step
 nb_layers = 2
 nb_cells = 100
+nb_encoder_cells = 100
 
 
 # model and their weights name
@@ -94,7 +95,7 @@ casiaB_3D_rnn_model_weight = "casiaB_3D_rnn_model_weight.h5"
 
 #encoder
 casiaB_encoder_model = "casiaB_encoder_model.json"
-casiaB_encoder_model_path = os.path.join(root_dir.model_path(), "encoder", casiaB_3D_rnn_model)
+casiaB_encoder_model_path = os.path.join(root_dir.model_path(), "encoder", casiaB_encoder_model)
 casiaB_encoder_model_weight = "casiaB_encoder_model_weight.h5"
 
 
