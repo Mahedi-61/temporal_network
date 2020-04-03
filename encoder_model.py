@@ -103,12 +103,12 @@ def autoencoder_network (x):
     x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
 
     # hidden GRU layers
-    x = GRU(config.nb_encoder_cells, return_sequences = True)(x)
-    x = GRU(80, return_sequences = False)(x)
+    x = GRU(config.nb_encoder_cells, activation = "relu", return_sequences = True)(x)
+    x = GRU(50, activation = "relu", return_sequences = False)(x)
     encoder_out = RepeatVector(nb_steps) (x)
 
-    x = GRU(80, return_sequences = True)(encoder_out)
-    x = GRU(config.nb_encoder_cells,return_sequences = True)(x)
+    x = GRU(50, activation = "relu", return_sequences = True)(encoder_out)
+    x = GRU(config.nb_encoder_cells, activation = "relu", return_sequences = True)(x)
 
     decoder_out = TimeDistributed(Dense(nb_features,  
                 kernel_regularizer = regularizers.l2(0.01))) (x) 

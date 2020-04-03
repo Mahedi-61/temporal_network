@@ -259,8 +259,8 @@ def load_encoder_train_data_per_group(data_type):
     total_id_list = sorted(os.listdir(config.casiaB_pose_data_dir), 
                     key = lambda x: int(x[1:]))
 
-    start_id = 25
-    end_id = 124
+    start_id = 1
+    end_id = 25
     angle_group = config.casiaB_angle_list[4:7]
     transform_angle = config.casiaB_angle_list[5]
 
