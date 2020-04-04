@@ -113,7 +113,7 @@ def get_temporal_model():
 
 
 def autoencoder_network (x):
-    #x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
+    x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
 
     # hidden GRU layers
     x = Bidirectional(GRU(config.nb_encoder_cells, 

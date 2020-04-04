@@ -22,13 +22,13 @@ from . import encoder_model
 from . import encoder_model_utils
 from . import make_dataset_encoder
 from . import config
-from .. import root_dir
+
 
 def scheduler_casiaB(epoch):
     if (epoch == 80):
         K.set_value(model.optimizer.lr, config.lr_1)
 
-    elif (epoch == 200):
+    elif (epoch == 180):
         K.set_value(model.optimizer.lr, config.lr_2)
 
     elif (epoch == 270):
@@ -90,6 +90,6 @@ model.fit(X_train, y_train,
             verbose = 2,
             validation_data=(X_valid, y_valid))
 
-best_weight_path = os.path.join(root_dir.casiaB_encoder_model_path(),
-                                group + "_" + "best_model.h5")
+best_weight_path = os.path.join(config.checkpoint_path(),
+                        group + "_" + "best_model.h5")
 model.save(best_weight_path)
