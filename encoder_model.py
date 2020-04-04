@@ -1,5 +1,18 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+"""
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (Input, Dense, LSTM, Lambda, TimeDistributed, 
+                          GRU, Layer,  Dropout, RepeatVector,
+                          BatchNormalization, Bidirectional, Activation)
+
+from tensorflow.keras import regularizers
+#from keras.engine.topology import Layer
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras import backend as K
+"""
+
 from keras.models import Model
 from keras.layers import (Input, Dense, LSTM, Lambda, TimeDistributed, GRU, Dropout, RepeatVector,
                           BatchNormalization, Bidirectional, Activation)
@@ -100,18 +113,31 @@ def get_temporal_model():
 
 
 def autoencoder_network (x):
-    x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
+    #x = BatchNormalization(momentum = 0.92, epsilon = 1e-5)(x)
 
     # hidden GRU layers
-    x = GRU(config.nb_encoder_cells, activation = "relu", return_sequences = True)(x)
-    x = GRU(50, activation = "relu", return_sequences = False)(x)
+    x = Bidirectional(GRU(config.nb_encoder_cells, 
+                                activation = "relu", 
+                                return_sequences = True), 
+                                merge_mode= "sum")(x)
+
+    x = Bidirectional(GRU(50, activation = "relu", 
+                            return_sequences = False), 
+                             merge_mode= "sum")(x)
     encoder_out = RepeatVector(nb_steps) (x)
 
-    x = GRU(50, activation = "relu", return_sequences = True)(encoder_out)
-    x = GRU(config.nb_encoder_cells, activation = "relu", return_sequences = True)(x)
 
-    decoder_out = TimeDistributed(Dense(nb_features,  
-                kernel_regularizer = regularizers.l2(0.01))) (x) 
+    x = Bidirectional(GRU(50, activation = "relu", 
+                            return_sequences = True), 
+                            merge_mode= "sum")(encoder_out)
+
+    x = Bidirectional(GRU(config.nb_encoder_cells, 
+                          activation = "relu", 
+                          return_sequences = True), 
+                          merge_mode= "sum")(x)
+
+    decoder_out = Dense(nb_features,  
+                        kernel_regularizer = regularizers.l2(0.01)) (x) 
 
     return encoder_out, decoder_out 
 
@@ -129,8 +155,8 @@ def get_autoencoder():
 
     # saving as json file in model directory
     open(config.casiaB_encoder_model_path, 'w').write(autoencoder_model.to_json())
-
     print("model json saved !!")
+
     return autoencoder_model
 
 

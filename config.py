@@ -93,6 +93,7 @@ casiaB_3D_rnn_model = "casiaB_3D_rnn_model.json"
 casiaB_3D_rnn_model_path = os.path.join(root_dir.model_path(), "casiaB_3D", casiaB_3D_rnn_model)
 casiaB_3D_rnn_model_weight = "casiaB_3D_rnn_model_weight.h5"
 
+
 #encoder
 casiaB_encoder_model = "casiaB_encoder_model.json"
 casiaB_encoder_model_path = os.path.join(root_dir.model_path(), "encoder", casiaB_encoder_model)
